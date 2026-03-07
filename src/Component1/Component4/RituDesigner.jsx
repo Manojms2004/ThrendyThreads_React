@@ -79,7 +79,7 @@ export default function RituDesigner({ wishlist, toggleWishlist }) {
             <b>Ritu Kumar</b> is one of India’s most celebrated fashion designers,
             known for reviving traditional Indian textiles and craftsmanship.
             Her collections beautifully blend heritage embroidery with modern
-            silhouettes, making her a pioneer ram in Indian couture.
+            silhouettes, making her a pioneer ram rav in Indian couture.
           </p>
 
           <p className="text-lg text-gray-700 leading-relaxed">
