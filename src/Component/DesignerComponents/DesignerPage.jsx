@@ -1,6 +1,6 @@
 // src/Components/RituDesigner.jsx
 import React, { useState } from "react";
-import ShopByOccasion from "../../ShopByOccasion";
+import ShopByOccasion from "../ShopByOccasion";
 
 export default function RituDesigner({ wishlist, toggleWishlist }) {
 
@@ -70,29 +70,57 @@ export default function RituDesigner({ wishlist, toggleWishlist }) {
           />
         </div>
 
-        <div className="w-full md:w-2/3">
-          <h1 className="text-4xl font-bold mb-4 text-gray-800">
-            Ritu Designer
+        <div className="w-full md:w-2/3 space-y-6">
+
+          {/* Designer Name */}
+          <h1 className="text-4xl font-bold text-gray-900">
+            Ritu Kumar
           </h1>
 
+          {/* Tagline */}
+          <p className="text-lg text-gray-600 ">
+            Pioneer of Indian Couture & Traditional Textile Revival
+          </p>
+
+          {/* Description */}
           <p className="text-lg text-gray-700 leading-relaxed">
-            <b>Ritu Kumar</b> is one of India’s most celebrated fashion designers,
+            <b>Ritu Kumar</b> is one of India's most celebrated fashion designers,
             known for reviving traditional Indian textiles and craftsmanship.
-            Her collections beautifully blend heritage embroidery with modern
-            silhouettes, making her a pioneer ram rav in Indian couture.
+            Since the late 1960s, she has played a major role in bringing
+            ancient embroidery techniques and handwoven fabrics back into
+            the world of contemporary fashion.
           </p>
 
           <p className="text-lg text-gray-700 leading-relaxed">
-            From bridal couture to contemporary festive wear, her creations
-            reflect elegance, sustainability, and timeless artistry.
+            Her collections beautifully blend heritage embroidery,
+            hand block printing, and luxurious fabrics with modern
+            silhouettes. From bridal couture to contemporary festive wear,
+            her designs reflect elegance, sustainability, and timeless artistry.
           </p>
 
+          {/* Highlights Section */}
+          <div className="bg-gray-50 p-5 rounded-lg shadow-sm">
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">
+              Designer Highlights
+            </h2>
+
+            <ul className="list-disc pl-5 space-y-2 text-gray-700">
+              <li>Over 50 years of contribution to Indian fashion.</li>
+              <li>Known for reviving traditional embroidery and handloom fabrics.</li>
+              <li>Collections featured in international fashion shows.</li>
+              <li>Designed bridal wear, couture, and festive collections.</li>
+              <li>Advocate for sustainable and handcrafted fashion.</li>
+            </ul>
+          </div>
+
+          {/* Button */}
           <button
             onClick={handleAddPro}
-            className="mt-6 px-6 py-2 bg-black text-white rounded hover:bg-gray-800"
+            className="mt-4 px-6 py-2 cursor-pointer bg-black text-white rounded-lg hover:bg-gray-800 transition"
           >
             Add Design
           </button>
+
         </div>
       </div>
 
@@ -149,17 +177,17 @@ export default function RituDesigner({ wishlist, toggleWishlist }) {
             <div className="flex justify-between pt-2">
 
               <button
-                onClick={handleAddProduct}
-                className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
-                Add Product
-              </button>
-
-              <button
                 onClick={() => setShowModal(false)}
                 className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
               >
                 Close
+              </button>
+
+              <button
+                onClick={handleAddProduct}
+                className="px-6 py-2 bg-green-600 cursor-pointer text-white rounded hover:bg-green-700"
+              >
+                Add Product
               </button>
 
             </div>

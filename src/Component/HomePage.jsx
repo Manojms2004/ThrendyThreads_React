@@ -162,7 +162,7 @@ export default function HomePage() {
       <div className="py-8 px-6">
         {/* Centered Heading */}
         <h2 className="text-4xl font-semibold mb-8 text-center">
-          Designers Category
+          Our Designers 
         </h2>
 
         {/* Cards Container */}
@@ -187,7 +187,7 @@ export default function HomePage() {
           ))}
         </div>
       </div>
-      <div className="px-8">
+      <div className="px-8 mt-5">
 
         {/* Heading */}
         <h2 className="text-4xl font-semibold mb-8 text-center">

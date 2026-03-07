@@ -1,7 +1,7 @@
 // src/Components/AdminDashboard.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaTimes } from "react-icons/fa";
-import { allProducts as initialProductsFromFile } from "./ProductsData";
+import { allProducts as initialProductsFromFile } from "../ProductsData";
 
 /**
  * AdminDashboard

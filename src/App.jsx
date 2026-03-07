@@ -1,30 +1,32 @@
 // src/App.jsx
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages & Components
-import Mainpage from "./Component1/Mainpage";
-import HomePage from "./HomePage";
-import LoginPage from "./Component1/LoginPage";
-import SignupPage from "./Component1/SignupPage";
-import AnitaDongre from "./AnitaDongre";
-import RituDesigner from "./Component1/Component4/RituDesigner";
-import LocateStore from "./LocateStore";
-import Contect from "./Contect";
-import Whishlist from "./Whishlist";
-import AdminDashboard from "./AdminDashboard";
-import ProductPage from "./ProductPage";
-import NeetuLulla from "./Component1/Component4/NeetuLulla";// Category Pages
-import Velvet from "./Component1/Component3/Velvet";
-import Denim from "./Component1/Component3/Denim";
-import Georgette from "./Component1/Component3/Georgette";
-import Sarees from "./Component1/Component3/Sarees";
-import Livin from "./Component1/Component3/Livin";
-import Silk from "./Component1/Component3/Silk";
-import SkirtsShorts from "./Component1/Component3/SkirtsShorts";
-import RohitBal from "./Component1/Component4/RohitBal";
-import Checkout from "./Checkout";
-import About from "./About";
+import Mainpage from "./Component/Mainpage";
+import HomePage from "./Component/HomePage";
+import LoginPage from "./Component/LoginPage";
+import SignupPage from "./Component/SignupPage";
+import AnitaDongre from "./Component/AnitaDongre";
+import RituDesigner from "./Component/DesignerComponents/DesignerPage";
+import LocateStore from "./Component/LocateStore";
+import Contect from "./Component/Contect";
+import Whishlist from "./Component/Whishlist";
+import AdminDashboard from "./Component/AdminDashBoardComponents/AdminDashboard";
+import ProductPage from "./Component/ProductPage";
+// import NeetuLulla from "./Component1/DesignerDashBoard/NeetuLulla";
+import Velvet from "./Component/DesingsComponents/Velvet";
+import Denim from "./Component/DesingsComponents/Denim";
+import Georgette from "./Component/DesingsComponents/Georgette";
+import Sarees from "./Component/DesingsComponents/Sarees";
+import Livin from "./Component/DesingsComponents/Livin";
+import Silk from "./Component/DesingsComponents/Silk";
+import SkirtsShorts from "./Component/DesingsComponents/SkirtsShorts";
+// import RohitBal from "./Component1/DesignerDashBoard/RohitBal";
+import Checkout from "./Component/Checkout";
+import About from "./Component/About";
 
 export default function App() {
   // Wishlist State with LocalStorage
@@ -91,7 +93,7 @@ export default function App() {
             />
           }
         />
-        <Route
+        {/* <Route
           path="/Neeta"
           element={
             <NeetuLulla
@@ -99,8 +101,8 @@ export default function App() {
               toggleWishlist={toggleWishlist}
             />
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="/rohit"
           element={
             <RohitBal
@@ -108,7 +110,7 @@ export default function App() {
               toggleWishlist={toggleWishlist}
             />
           }
-        />
+        /> */}
 
         {/* ================= PRODUCT DETAILS ================= */}
         <Route
@@ -146,11 +148,20 @@ export default function App() {
         <Route path="/livin" element={<Livin />} />
         <Route path="/silk" element={<Silk />} />
         <Route path="/skirts-shorts" element={<SkirtsShorts />} />
-         <Route path="/about" element={<About />} />
-                 
+        <Route path="/about" element={<About />} />
+
 
 
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="colored"
+      />
     </Router>
   );
 }
