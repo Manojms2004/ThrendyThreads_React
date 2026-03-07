@@ -11,7 +11,7 @@ export default function NeetuLulla({ wishlist, toggleWishlist }) {
     name: "",
     img: "",
     price: "",
-    category: "cotton",  
+    category: "cotton",   
   });
 
   const ADMIN_PASSWORD = "neetu123";
