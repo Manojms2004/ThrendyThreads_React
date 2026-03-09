@@ -1,59 +1,166 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
+export default function ContactUs() {
 
-function Contect({ onClose }) {
-  const [mobile, setMobile] = useState("");
-  const [notify, setNotify] = useState(false);
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    reason: "",
+    subject: "",
+    message: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Mobile: ${mobile}, Notify: ${notify}`);
+
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.reason ||
+      !formData.subject ||
+      !formData.message
+    ) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    console.log(formData);
+    alert("Message sent successfully!");
+
+    setFormData({
+      name: "",
+      email: "",
+      reason: "",
+      subject: "",
+      message: "",
+    });
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg relative w-[400px] shadow-lg">
-        <button
-          type="button"
-          className="absolute top-3 right-3 text-xl"
-          onClick={onClose}
-        >
-          ✕
-        </button>
 
-        <h2 className="text-2xl font-bold mb-4">TrendyThreads</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="flex mb-4 border rounded-md overflow-hidden">
-            <span className="bg-gray-200 px-3 py-2 border-r">+91</span>
+    <div className="min-h-screen bg-gray-100">
+
+      <button
+        onClick={() => navigate("/home")}
+        className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded cursor-pointer absolute z-1 mt-5 ml-5"
+      >
+        ← Back
+      </button>
+      {/* Top Black Section */}
+      <div className="bg-black py-20 text-center">
+        <h1 className="text-4xl font-bold text-white">
+          Contact Us
+        </h1>
+      </div>
+
+
+      {/* Form Card */}
+      <div className="max-w-2xl mx-auto -mt-16 px-4">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-8 rounded-lg shadow-lg space-y-4"
+        >
+
+          {/* Name */}
+          <div>
+            <label className="block font-semibold mb-1">
+              Your Name
+            </label>
             <input
-              type="tel"
-              placeholder="Enter Mobile Number"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              required
-              className="flex-1 px-3 py-2 outline-none"
+              type="text"
+              name="name"
+              placeholder="Enter your name"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
             />
           </div>
 
-          <label className="block text-sm mb-4">
+          {/* Email */}
+          <div>
+            <label className="block font-semibold mb-1">
+              Email Address
+            </label>
             <input
-              type="checkbox"
-              checked={notify}
-              onChange={(e) => setNotify(e.target.checked)}
-              className="mr-2"
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
             />
-            Notify me with offers & updates
-          </label>
+          </div>
 
+          {/* Reason */}
+          <div>
+            <label className="block font-semibold mb-1">
+              Reason For Contact
+            </label>
+            <select
+              name="reason"
+              value={formData.reason}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            >
+              <option value="">Select reason</option>
+              <option value="order">Order Issue</option>
+              <option value="product">Product Inquiry</option>
+              <option value="return">Return / Refund</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          {/* Subject */}
+          <div>
+            <label className="block font-semibold mb-1">
+              Subject
+            </label>
+            <input
+              type="text"
+              name="subject"
+              placeholder="Enter subject"
+              value={formData.subject}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
+          </div>
+
+          {/* Message */}
+          <div>
+            <label className="block font-semibold mb-1">
+              Your Message
+            </label>
+            <textarea
+              name="message"
+              rows="3"
+              placeholder="Write your message..."
+              value={formData.message}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            ></textarea>
+          </div>
+
+          {/* Button */}
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800"
+            className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
           >
             Submit
           </button>
+
         </form>
       </div>
+
     </div>
+
   );
 }
-
-export default Contect;

@@ -29,14 +29,14 @@ export default function Footer() {
 
         {/* About */}
         <div className="flex flex-col gap-2 text-sm">
-  <Link to="/about">
-    About Us
-  </Link>
+          <Link to="/about">
+            About Us
+          </Link>
 
-  <Link to="/locatestore" >
-    Store Locator
-  </Link>
-</div>
+          <Link to="/locatestore" >
+            Store Locator
+          </Link>
+        </div>
 
         {/* Social */}
         <div className="space-y-4">

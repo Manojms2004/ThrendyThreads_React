@@ -1,24 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FiSearch,
-  FiHeart,
-  FiUser,
-  FiShoppingBag
-} from "react-icons/fi";
-import {
-  FaChevronLeft,
-  FaChevronRight
-} from "react-icons/fa";
-import { RxHamburgerMenu } from "react-icons/rx";
+import { FiSearch, FiLogOut } from "react-icons/fi";
+import { FaChevronLeft, FaChevronRight, FaStar, FaRegHeart } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
 
-import { FaStar, FaRegHeart } from "react-icons/fa";
 import Contect from "./Contect";
 import Footer from "./Footer";
 
 const images = [
   "https://images.pexels.com/photos/6347952/pexels-photo-6347952.jpeg",
-  "https://images.pexels.com/photos/8770070/pexels-photo-8770070.jpeg",
+  "https://images.pexels.com/photos/3768600/pexels-photo-3768600.jpeg",
   "https://images.pexels.com/photos/914930/pexels-photo-914930.jpeg"
 ];
 
@@ -95,8 +86,17 @@ function StoreLocatorBanner() {
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [showImg, setImg] = useState(0);
+   const [showImg, setImg] = useState(0);
   const [showContect, setShowContect] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+
+  const dropdownRef = useRef(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -105,12 +105,28 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="relative">
 
       {/* Navbar */}
-      <div className="flex items-center justify-between px-2 py-3 bg-white shadow-md">
+      <div className="flex items-center justify-between px-6 py-3 bg-white shadow-md">
+
+        {/* Logo */}
         <div className="text-2xl font-bold">TrendyThreads</div>
+
+        {/* Search */}
         <div className="relative w-64">
           <FiSearch className="absolute top-2.5 left-3 text-gray-500" size={20} />
           <input
@@ -119,13 +135,94 @@ export default function HomePage() {
             className="w-full pl-10 pr-4 py-2 border rounded-md"
           />
         </div>
-        <div className="flex gap-4 text-xl items-center">
-          <FiHeart onClick={() => navigate("/Whishlist")} className="cursor-pointer" />
-          <FiUser onClick={() => setShowContect(true)} className="cursor-pointer" />
-          <FiShoppingBag onClick={() => navigate("/AddCart")} className="cursor-pointer" />
-          <RxHamburgerMenu className="cursor-pointer" />
+
+        {/* Navigation + User */}
+        <div className="flex items-center gap-8">
+
+          {/* Nav Links */}
+          <nav className="flex gap-6 text-lg font-medium">
+            <span
+              onClick={() => navigate("/home")}
+              className="cursor-pointer hover:text-blue-500 text-[16px]"
+            >
+              Home
+            </span>
+
+            <span
+              onClick={() => navigate("/about")}
+              className="cursor-pointer hover:text-blue-500 text-[16px]"
+            >
+              About Us
+            </span>
+
+            <span
+              onClick={() => navigate("/contact")}
+              className="cursor-pointer hover:text-blue-500 text-[16px]"
+            >
+              Contact
+            </span>
+          </nav>
+
+          {/* User Profile */}
+          <div className="relative" ref={dropdownRef}>
+
+            <div
+              onClick={() => setShowMenu(!showMenu)}
+              className="flex items-center gap-3 cursor-pointer px-3 py-1.5 rounded-full hover:bg-gray-100 transition"
+            >
+              <img
+                src="https://i.pravatar.cc/40"
+                alt="user"
+                className="w-9 h-9 rounded-full border-2 border-gray-200"
+              />
+
+              <span className="font-medium text-gray-700">User</span>
+
+              <svg
+                className="w-4 h-4 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+
+            {/* Dropdown */}
+            {showMenu && (
+              <div className="absolute right-0 mt-1 w-40 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+
+                {/* Dashboard */}
+                <div
+                  onClick={() => navigate("/adminDashboard")}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
+                >
+                  <MdDashboard className="text-gray-600 text-lg" />
+                  <span className="text-sm font-medium text-gray-700">
+                    Dashboard
+                  </span>
+                </div>
+
+                {/* Logout */}
+                <div
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 cursor-pointer transition"
+                >
+                  <FiLogOut className="text-red-500 text-lg" />
+                  <span className="text-sm font-medium text-red-500">
+                    Logout
+                  </span>
+                </div>
+
+              </div>
+            )}
+
+          </div>
+
         </div>
       </div>
+
 
       {/* Banner */}
       <div className="relative w-full overflow-hidden p-10">
@@ -162,7 +259,7 @@ export default function HomePage() {
       <div className="py-8 px-6">
         {/* Centered Heading */}
         <h2 className="text-4xl font-semibold mb-8 text-center">
-          Our Designers 
+          Our Designers
         </h2>
 
         {/* Cards Container */}

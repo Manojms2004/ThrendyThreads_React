@@ -2,13 +2,18 @@ import { useNavigate } from "react-router-dom";
 
 export default function About() {
 
-  const navigate = useNavigate(); // 🔥 add this
+  const navigate = useNavigate(); 
 
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* 🔥 Banner Image Section */}
-      <div className="relative h-[400px] w-full">
+      <div className="relative h-[300px] w-full">
+        <button
+          onClick={() => navigate("/home")}
+          className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded cursor-pointer absolute z-1 mt-5 ml-5"
+        >
+          ← Back
+        </button>
         <img
           src="/ShopBrand.png"
           alt="TreandyThreads"
@@ -23,7 +28,6 @@ export default function About() {
         </div>
       </div>
 
-      {/* 🔥 Content Section */}
       <div className="max-w-5xl mx-auto px-6 py-12 bg-white shadow-lg -mt-16 relative z-10 rounded-xl">
 
         <p className="text-gray-700 leading-relaxed mb-6">
@@ -56,13 +60,7 @@ export default function About() {
           confidence and grace.
         </p>
 
-        {/* 🔥 BACK BUTTON */}
-        <button
-          onClick={() => navigate("/home")}
-          className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
-        >
-          ← Back to Home
-        </button>
+        
 
       </div>
     </div>
