@@ -99,7 +99,7 @@ const RoutingPage = () => {
                 <Route path="/adminDashboard" element={<AdminDashboard />} />
 
                 <Route path="/locatestore" element={<LocateStore />} />
-                <Route path="/contact" element={<Contect />} />
+                <Route path="/home/contact" element={<Contect />} />
                 <Route
                     path="/wishlist"
                     element={
@@ -117,7 +117,7 @@ const RoutingPage = () => {
                 <Route path="/livin" element={<Livin />} />
                 <Route path="/silk" element={<Silk />} />
                 <Route path="/skirts-shorts" element={<SkirtsShorts />} />
-                <Route path="/about" element={<About />} />
+                <Route path="/home/about" element={<About />} />
 
             </Routes>
             <ToastContainer

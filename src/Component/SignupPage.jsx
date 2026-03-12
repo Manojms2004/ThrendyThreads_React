@@ -64,7 +64,7 @@ function SignupPage() {
 
             <button
               onClick={closeSignup}
-              className="absolute top-2 right-2 text-2xl mr-4 hover:text-blue-600"
+              className="absolute top-2 right-2 text-2xl mr-4 hover:text-black cursor-pointer"
             >
               X
             </button>
@@ -128,7 +128,7 @@ function SignupPage() {
 
             {/* Signup Button */}
             <button
-              className="w-full bg-blue-400 hover:bg-blue-500 text-white font-semibold py-2 rounded-full transition duration-200 disabled:opacity-50 cursor-pointer"
+              className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition duration-300 cursor-pointer"
               onClick={() => {
                 if (!isFormValid) return;
 
@@ -146,7 +146,7 @@ function SignupPage() {
             <p className="text-center mt-4 text-sm text-gray-700">
               Already registered?
               <span
-                className="ml-2 text-blue-500 hover:underline cursor-pointer font-medium"
+                className="ml-2 text-black hover:underline cursor-pointer font-medium"
                 onClick={() => navigate('/login')}
               >
                 Login

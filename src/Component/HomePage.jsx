@@ -149,14 +149,14 @@ export default function HomePage() {
             </span>
 
             <span
-              onClick={() => navigate("/about")}
+              onClick={() => navigate("/home/about")}
               className="cursor-pointer hover:text-blue-500 text-[16px]"
             >
               About Us
             </span>
 
             <span
-              onClick={() => navigate("/contact")}
+              onClick={() => navigate("/home/contact")}
               className="cursor-pointer hover:text-blue-500 text-[16px]"
             >
               Contact

@@ -41,7 +41,7 @@ function LoginPage() {
           <div className='p-8 rounded-lg shadow-lg bg-white bg-opacity-80 relative'>
             <button
               onClick={closeLogin}
-              className="absolute top-2 right-2 text-2xl mr-4 hover:text-blue-600"
+              className="absolute top-2 right-2 text-2xl mr-4 hover:text-black cursor-pointer"
               aria-label="Close Login"> X
             </button>
             <div>
@@ -75,11 +75,11 @@ function LoginPage() {
 
               {/* Login Button */}
               <button
-                className="w-full bg-blue-400 hover:bg-blue-500 text-white py-2 rounded disabled:opacity-50 cursor-pointer"
+                className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition duration-300 cursor-pointer"
                 disabled={!isFormValid}
                 onClick={() => {
                   toast.success("Login Successfull")
-                  navigate('/Home')
+                  navigate('/home')
                 }}
               >
                 Login
@@ -89,7 +89,7 @@ function LoginPage() {
               <div className="mt-4 text-sm text-black text-center">
                 <span>New to TrendyThreads? </span>
                 <span
-                  className="text-blue-500 hover:underline cursor-pointer font-medium"
+                  className="text-black hover:underline cursor-pointer font-medium"
                   onClick={() => navigate('/signup')}
                 >
                   Sign Up
