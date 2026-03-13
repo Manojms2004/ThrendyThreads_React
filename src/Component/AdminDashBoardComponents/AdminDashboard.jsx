@@ -284,93 +284,151 @@ export default function FashionDesignerDashboard() {
 
         {/* Add Admin Modal */}
         {showAdminForm && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 px-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-8 overflow-y-auto max-h-[90vh]">
+              <h2 className="text-2xl font-bold mb-6 text-center">Add New Designer</h2>
 
-            <div className="bg-white p-6 rounded-lg shadow-xl w-96">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-              <h3 className="text-xl font-bold mb-4">Add Designer</h3>
+                {/* User Info Section */}
+                <div className="space-y-4 p-4 border rounded-lg shadow-sm">
+                  <h3 className="text-lg font-semibold mb-2">User Information</h3>
 
-              <input
-                type="text"
-                placeholder="Designer ID"
-                className="w-full border p-2 mb-2 rounded"
-                value={newAdmin.id}
-                onChange={(e) =>
-                  setNewAdmin({ ...newAdmin, id: e.target.value })
-                }
-              />
+                  <div>
+                    <label className="block text-sm font-medium mb-1">User Name</label>
+                    <input
+                      type="text"
+                      placeholder="Enter user name"
+                      className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                      value={newAdmin.userName}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, userName: e.target.value })
+                      }
+                    />
+                  </div>
 
-              <input
-                type="text"
-                placeholder="Designer Name"
-                className="w-full border p-2 mb-2 rounded"
-                value={newAdmin.name}
-                onChange={(e) =>
-                  setNewAdmin({ ...newAdmin, name: e.target.value })
-                }
-              />
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Password</label>
+                    <input
+                      type="password"
+                      placeholder="Enter password"
+                      className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                      value={newAdmin.password}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, password: e.target.value })
+                      }
+                    />
+                  </div>
 
-              <input
-                type="email"
-                placeholder="Designer Email"
-                className="w-full border p-2 mb-2 rounded"
-                value={newAdmin.email}
-                onChange={(e) =>
-                  setNewAdmin({ ...newAdmin, email: e.target.value })
-                }
-              />
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Email</label>
+                    <input
+                      type="email"
+                      placeholder="Enter email"
+                      className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                      value={newAdmin.email}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, email: e.target.value })
+                      }
+                    />
+                  </div>
 
-              <textarea
-                placeholder="About Designer"
-                className="w-full border p-2 mb-2 rounded"
-                value={newAdmin.about}
-                onChange={(e) =>
-                  setNewAdmin({ ...newAdmin, about: e.target.value })
-                }
-              />
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Profile Image</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="w-full border p-3 rounded-lg"
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, image: e.target.files[0] })
+                      }
+                    />
+                    {newAdmin.image && (
+                      <img
+                        src={URL.createObjectURL(newAdmin.image)}
+                        alt="Preview"
+                        className="mt-2 w-32 h-32 object-cover rounded-lg border shadow-sm"
+                      />
+                    )}
+                  </div>
+                </div>
 
-              <input
-                type="text"
-                placeholder="Phone Number"
-                className="w-full border p-2 mb-2 rounded"
-                value={newAdmin.phone}
-                onChange={(e) =>
-                  setNewAdmin({ ...newAdmin, phone: e.target.value })
-                }
-              />
+                {/* Designer Info Section */}
+                <div className="space-y-4 p-4 border rounded-lg shadow-sm">
+                  <h3 className="text-lg font-semibold mb-2">Designer Details</h3>
 
-              <input
-                type="text"
-                placeholder="Address"
-                className="w-full border p-2 mb-2 rounded"
-                value={newAdmin.address}
-                onChange={(e) =>
-                  setNewAdmin({ ...newAdmin, address: e.target.value })
-                }
-              />
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Designer Name</label>
+                    <input
+                      type="text"
+                      placeholder="Enter designer name"
+                      className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                      value={newAdmin.designerName}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, designerName: e.target.value })
+                      }
+                    />
+                  </div>
 
-              <div className="flex justify-end gap-2 mt-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">About Designer</label>
+                    <textarea
+                      placeholder="Describe the designer"
+                      className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                      value={newAdmin.aboutDesigner}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, aboutDesigner: e.target.value })
+                      }
+                    />
+                  </div>
 
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Phone Number</label>
+                    <input
+                      type="text"
+                      placeholder="Enter phone number"
+                      className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                      value={newAdmin.phoneNumber}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, phoneNumber: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Address</label>
+                    <input
+                      type="text"
+                      placeholder="Enter address"
+                      className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                      value={newAdmin.address}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, address: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-4 mt-6">
                 <button
                   onClick={() => setShowAdminForm(false)}
-                  className="border px-3 py-1 rounded"
+                  className="px-6 py-2 rounded-lg border hover:bg-gray-100 transition cursor-pointer"
                 >
                   Cancel
                 </button>
-
                 <button
                   onClick={handleAddAdmin}
-                  className="bg-black text-white px-3 py-1 rounded hover:bg-gray-800"
+                  className="px-6 py-2 rounded-lg bg-black cursor-pointer text-white font-semibold hover:bg-black-700 transition"
                 >
                   Submit
                 </button>
-
               </div>
-
             </div>
-
           </div>
         )}
+
 
       </main>
 
