@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { allProducts } from "./ProductsData";
-import { FaStar, FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaStar, FaHeart, FaRegHeart, FaArrowLeft, FaWhatsapp } from "react-icons/fa";
 
 export default function ProductPage({ wishlist = [], toggleWishlist }) {
   const { id } = useParams();
@@ -10,47 +10,28 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
   const location = useLocation();
 
   const [showForm, setShowForm] = useState(false);
+  const [requestData, setRequestData] = useState({ name: "", phone: "", message: "" });
 
-  const [requestData, setRequestData] = useState({
-    name: "",
-    phone: "",
-    message: "",
-  });
-
-  // 🔥 Merge static + dynamic products
   const mergedProducts = [
     ...allProducts,
     ...(location.state?.extraProducts || []),
   ];
 
-  const product = mergedProducts.find(
-    (p) => p.id === parseInt(id)
-  );
+  const product = mergedProducts.find((p) => p.id === parseInt(id));
 
   if (!product)
-    return <div className="p-6 text-center">Product not found</div>;
-
-  /* ============================= */
-  /* ===== RELATED PRODUCTS LOGIC */
-  /* ============================= */
+    return (
+      <div style={{ padding: "2rem", fontSize: "1.2rem", color: "#111" }}>
+        Product not found.
+      </div>
+    );
 
   const relatedProducts = mergedProducts
     .filter((p) => {
-      // If product has designer → match category + designer
       if (product.designer) {
-        return (
-          p.category === product.category &&
-          p.designer === product.designer &&
-          p.id !== product.id
-        );
+        return p.category === product.category && p.designer === product.designer && p.id !== product.id;
       }
-
-      // If product has no designer → match only category & no designer
-      return (
-        p.category === product.category &&
-        !p.designer &&
-        p.id !== product.id
-      );
+      return p.category === product.category && !p.designer && p.id !== product.id;
     })
     .slice(0, 4);
 
@@ -60,10 +41,6 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
       currency: "INR",
       maximumFractionDigits: 0,
     }).format(amount);
-
-  /* ============================= */
-  /* ===== Request Change Logic === */
-  /* ============================= */
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -75,117 +52,132 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
       alert("Please enter Name and Phone Number");
       return;
     }
-
-    const finalMessage = `
-Hello,
-
-I would like to request a change for:
-
-Product: ${product.name}
-Price: ₹${product.finalPrice}
-Category: ${product.category}
-
-Customer Name: ${requestData.name}
-Phone: ${requestData.phone}
-
-Requested Changes:
-${requestData.message || "No details provided"}
-
-Thank you.
-`;
-
-    const whatsappLink = `https://wa.me/919876543210?text=${encodeURIComponent(
-      finalMessage
-    )}`;
-
-    window.open(whatsappLink, "_blank");
-
+    const finalMessage = `Hello,\n\nProduct: ${product.name}\nPrice: ₹${product.finalPrice}\nCategory: ${product.category}\n\nCustomer Name: ${requestData.name}\nPhone: ${requestData.phone}\n\nRequested Changes:\n${requestData.message || "No details provided"}\n\nThank you.`;
+    window.open(`https://wa.me/919876543210?text=${encodeURIComponent(finalMessage)}`, "_blank");
     setShowForm(false);
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
+    <div style={{ background: "#f5f5f5", height: "100vh", overflow: "hidden", padding: "10px", fontFamily: "sans-serif", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="mb-6 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "#111", color: "#fff", border: "none", padding: "7px 14px", borderRadius: "4px", fontSize: "12px", fontWeight: "600", cursor: "pointer", marginBottom: "10px", letterSpacing: "0.05em", width: "fit-content" }}
       >
-        ← Go Back
+        <FaArrowLeft size={10} /> Back
       </button>
 
-      <div className="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-md flex flex-col md:flex-row gap-10">
+      {/* Main Layout: 70% left + 30% right */}
+      <div style={{ display: "flex", gap: "10px", flex: 1, overflow: "hidden" }}>
 
-        {/* IMAGE */}
-        <div className="md:w-2/5 relative">
-          <img
-            src={product.img}
-            alt={product.name}
-            className="w-full rounded-xl shadow-lg"
-          />
+        {/* LEFT — 70% — Product Image + Details */}
+        <div style={{ width: "70%", display: "flex", gap: "10px", background: "#fff", borderRadius: "8px", boxShadow: "0 1px 8px rgba(0,0,0,0.08)", overflow: "hidden" }}>
 
-          <button
-            onClick={() => toggleWishlist(product.id)}
-            className="absolute top-4 right-4 bg-white p-3 rounded-full shadow"
-          >
-            {wishlist.includes(product.id) ? (
-              <FaHeart className="text-red-500 text-lg" />
-            ) : (
-              <FaRegHeart className="text-lg" />
-            )}
-          </button>
-        </div>
-
-        {/* DETAILS */}
-        <div className="md:w-3/5 space-y-5">
-
-          <h1 className="text-3xl font-bold text-gray-900">
-            {product.name}
-          </h1>
-
-          <div className="flex items-center gap-3">
-            <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
-              <FaStar />
-              {product.rating}
-            </span>
-            <span className="text-gray-500 text-sm">
-              ({product.reviews} reviews)
-            </span>
+          {/* Product Image */}
+          <div style={{ width: "45%", position: "relative", background: "#eee", flexShrink: 0 }}>
+            <img
+              src={product.img}
+              alt={product.name}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+            <button
+              onClick={() => toggleWishlist(product.id)}
+              style={{ position: "absolute", top: "10px", right: "10px", background: "#fff", border: "none", borderRadius: "50%", width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", cursor: "pointer" }}
+            >
+              {wishlist.includes(product.id)
+                ? <FaHeart style={{ color: "#111", fontSize: "15px" }} />
+                : <FaRegHeart style={{ color: "#999", fontSize: "15px" }} />}
+            </button>
           </div>
 
-          <div>
-            <div className="text-3xl font-semibold text-gray-900">
-              {formatPrice(product.finalPrice)}
+          {/* Product Details */}
+          <div style={{ flex: 1, padding: "20px 18px", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+
+            <span style={{ fontSize: "10px", fontWeight: "700", letterSpacing: "0.15em", textTransform: "uppercase", color: "#888", borderBottom: "2px solid #111", paddingBottom: "2px", width: "fit-content" }}>
+              {product.category}
+            </span>
+
+            <h1 style={{ fontSize: "1.5rem", fontWeight: "800", color: "#111", margin: "8px 0 6px", lineHeight: "1.2" }}>
+              {product.name}
+            </h1>
+
+            {/* Rating */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "40px" }}>
+              <span style={{ background: "#111", color: "#fff", padding: "3px 9px", borderRadius: "3px", fontSize: "11px", fontWeight: "700", display: "flex", alignItems: "center", gap: "4px" }}>
+                <FaStar size={9} /> {product.rating}
+              </span>
+              <span style={{ fontSize: "11px", color: "#999" }}>({product.reviews} reviews)</span>
             </div>
 
-            {product.oldPrice && (
-              <div className="flex items-center gap-3">
-                <span className="line-through text-gray-500">
-                  {formatPrice(product.oldPrice)}
-                </span>
-                <span className="text-green-600 font-medium">
-                  {product.discount}
-                </span>
+            <div style={{ borderTop: "1px solid #eee", paddingTop: "12px", marginBottom: "40px" }}>
+              <div style={{ fontSize: "1.6rem", fontWeight: "800", color: "#111", lineHeight: "1" }}>
+                {formatPrice(product.finalPrice)}
               </div>
-            )}
+              {product.oldPrice && (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "5px" }}>
+                  <span style={{ textDecoration: "line-through", color: "#bbb", fontSize: "13px" }}>
+                    {formatPrice(product.oldPrice)}
+                  </span>
+                  <span style={{ background: "#111", color: "#fff", fontSize: "10px", fontWeight: "700", padding: "2px 7px", borderRadius: "3px", letterSpacing: "0.08em" }}>
+                    {product.discount} OFF
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                onClick={() => navigate("/checkout", { state: { product } })}
+                style={{ flex: 1, background: "#111", color: "#fff", border: "2px solid #111", padding: "10px 12px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
+              >
+                Buy Now
+              </button>
+              <button
+                onClick={() => setShowForm(true)}
+                style={{ flex: 1, background: "#fff", color: "#111", border: "2px solid #111", padding: "10px 12px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
+              >
+                Request Change
+              </button>
+            </div>
+
           </div>
+        </div>
 
-          <div className="flex gap-4 mt-4">
-            <button
-              onClick={() =>
-                navigate("/checkout", { state: { product } })
-              }
-              className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-3 rounded-lg font-semibold transition"
-            >
-              Buy Now
-            </button>
+        {/* RIGHT — 30% — Related Products */}
+        <div style={{ width: "30%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition"
-            >
-              Request Change
-            </button>
+          <h2 style={{ fontSize: "13px", fontWeight: "800", color: "#111", margin: "0 0 4px 0", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+            Related Products
+          </h2>
+          <div style={{ width: "32px", height: "2px", background: "#111", borderRadius: "2px", marginBottom: "10px" }} />
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", overflowY: "auto", flex: 1, paddingRight: "2px" }}>
+            {relatedProducts.length === 0 && (
+              <p style={{ fontSize: "12px", color: "#999" }}>No related products found.</p>
+            )}
+            {relatedProducts.map((relProd) => (
+              <div
+                key={relProd.id}
+                onClick={() => navigate(`/product/${relProd.id}`, { state: { extraProducts: location.state?.extraProducts } })}
+                style={{height:"300px", cursor: "pointer", background: "#fff", borderRadius: "6px", overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.07)", border: "1px solid #ececec", display: "flex", gap: "0" }}
+              >
+                <img
+                  src={relProd.img}
+                  alt={relProd.name}
+                  style={{ width: "150px", height: "200px", objectFit: "cover", flexShrink: 0 }}
+                />
+                <div style={{ padding: "8px 10px", display: "flex", flexDirection: "column", justifyContent: "center", overflow: "hidden" }}>
+                  <p style={{ fontSize: "12px", fontWeight: "600", color: "#222", margin: "0 0 4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {relProd.name}
+                  </p>
+                  <p style={{ fontSize: "13px", fontWeight: "700", color: "#111", margin: 0 }}>
+                    {formatPrice(relProd.finalPrice)}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
 
         </div>
@@ -193,92 +185,48 @@ Thank you.
 
       {/* REQUEST CHANGE MODAL */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-xl w-[90%] md:w-[450px] space-y-4">
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, padding: "16px" }}>
+          <div style={{ background: "#fff", width: "100%", maxWidth: "400px", borderRadius: "8px", padding: "22px", boxShadow: "0 8px 40px rgba(0,0,0,0.2)" }}>
 
-            <h2 className="text-xl font-semibold">
+            <h2 style={{ fontSize: "1.1rem", fontWeight: "800", color: "#111", marginBottom: "14px" }}>
               Request Outfit Change
             </h2>
 
             <input
-              type="text"
-              name="name"
-              placeholder="Your Name"
-              value={requestData.name}
-              onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              type="text" name="name" placeholder="Your Name"
+              value={requestData.name} onChange={handleInputChange}
+              style={{ width: "100%", border: "1.5px solid #ddd", borderRadius: "4px", padding: "9px 12px", fontSize: "13px", color: "#111", outline: "none", marginBottom: "8px", boxSizing: "border-box" }}
             />
-
             <input
-              type="tel"
-              name="phone"
-              placeholder="Phone Number"
-              value={requestData.phone}
-              onChange={handleInputChange}
-              className="w-full border p-2 rounded"
+              type="tel" name="phone" placeholder="Phone Number"
+              value={requestData.phone} onChange={handleInputChange}
+              style={{ width: "100%", border: "1.5px solid #ddd", borderRadius: "4px", padding: "9px 12px", fontSize: "13px", color: "#111", outline: "none", marginBottom: "8px", boxSizing: "border-box" }}
             />
-
             <textarea
-              name="message"
-              placeholder="Describe what changes you want in the outfit..."
-              value={requestData.message}
-              onChange={handleInputChange}
-              className="w-full border p-2 rounded"
-              rows="4"
+              name="message" placeholder="Describe what changes you want..."
+              value={requestData.message} onChange={handleInputChange}
+              rows={3}
+              style={{ width: "100%", border: "1.5px solid #ddd", borderRadius: "4px", padding: "9px 12px", fontSize: "13px", color: "#111", outline: "none", marginBottom: "14px", boxSizing: "border-box", resize: "none", fontFamily: "inherit" }}
             />
 
-            <div className="flex justify-between">
+            <div style={{ display: "flex", gap: "8px" }}>
               <button
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 bg-gray-400 text-white rounded"
+                style={{ flex: 1, background: "#fff", color: "#111", border: "2px solid #ccc", padding: "9px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
               >
                 Cancel
               </button>
-
               <button
                 onClick={handleSubmit}
-                className="px-4 py-2 bg-green-600 text-white rounded"
+                style={{ flex: 2, background: "#111", color: "#fff", border: "2px solid #111", padding: "9px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
               >
-                Submit
+                <FaWhatsapp size={13} /> Send via WhatsApp
               </button>
             </div>
 
           </div>
         </div>
       )}
-
-      {/* RELATED PRODUCTS */}
-      <div className="max-w-6xl mx-auto mt-14">
-        <h2 className="text-2xl font-bold mb-6">
-          Related Products
-        </h2>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {relatedProducts.map((relProd) => (
-            <div
-              key={relProd.id}
-              onClick={() =>
-                navigate(`/product/${relProd.id}`, {
-                  state: { extraProducts: location.state?.extraProducts },
-                })
-              }
-              className="cursor-pointer bg-white rounded-xl p-3 shadow hover:shadow-lg transition"
-            >
-              <img
-                src={relProd.img}
-                alt={relProd.name}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <p className="mt-3 text-sm font-medium">
-                {relProd.name}
-              </p>
-              <p className="text-red-600 font-semibold">
-                {formatPrice(relProd.finalPrice)}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
 
     </div>
   );

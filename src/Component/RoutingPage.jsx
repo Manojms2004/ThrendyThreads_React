@@ -10,7 +10,7 @@ import SignupPage from "./SignupPage";
 import AnitaDongre from "./AnitaDongre";
 import RituDesigner from "./DesignerComponents/DesignerPage";
 import LocateStore from "./LocateStore";
-import Contect from "./Contect";
+import Contect from "./Contact";
 import Whishlist from "./Whishlist";
 import AdminDashboard from "./AdminDashBoardComponents/AdminDashboard";
 import ProductPage from "./ProductPage";

@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function ContactUs() {
 
   const navigate = useNavigate();
@@ -19,7 +23,7 @@ export default function ContactUs() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (
@@ -29,25 +33,45 @@ export default function ContactUs() {
       !formData.subject ||
       !formData.message
     ) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
-    console.log(formData);
-    alert("Message sent successfully!");
+    try {
+      const payload = {
+        yourName: formData.name,
+        emailAddress: formData.email,
+        reasonForContact: formData.reason,
+        subject: formData.subject,
+        yourMessage: formData.message
+      };
 
-    setFormData({
-      name: "",
-      email: "",
-      reason: "",
-      subject: "",
-      message: "",
-    });
+      await axios.post(
+        "https://localhost:44332/api/Contact/AddContact",
+        payload
+      );
+
+      toast.success("Message sent successfully");
+
+      setFormData({
+        name: "",
+        email: "",
+        reason: "",
+        subject: "",
+        message: "",
+      });
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to send message");
+    }
   };
 
   return (
 
     <div className="min-h-screen bg-gray-100">
+
+      <ToastContainer position="top-right" autoClose={3000} />
 
       <button
         onClick={() => navigate("/home")}
@@ -55,13 +79,13 @@ export default function ContactUs() {
       >
         ← Back
       </button>
+
       {/* Top Black Section */}
       <div className="bg-black py-20 text-center">
         <h1 className="text-4xl font-bold text-white">
           Contact Us
         </h1>
       </div>
-
 
       {/* Form Card */}
       <div className="max-w-2xl mx-auto -mt-16 px-4">
@@ -152,7 +176,7 @@ export default function ContactUs() {
           {/* Button */}
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
+            className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition cursor-pointer"
           >
             Submit
           </button>

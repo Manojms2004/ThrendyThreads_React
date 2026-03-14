@@ -4,7 +4,7 @@ import { FiSearch, FiLogOut } from "react-icons/fi";
 import { FaChevronLeft, FaChevronRight, FaStar, FaRegHeart } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 
-import Contect from "./Contect";
+import Contect from "./Contact";
 import Footer from "./Footer";
 
 const images = [

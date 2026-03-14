@@ -234,53 +234,80 @@ export default function FashionDesignerDashboard() {
         )}
 
         {/* Designers Page */}
-        {activePage === "designers" && (
-          <>
+{activePage === "designers" && (
+  <div>
 
-            <h2 className="text-2xl font-bold mb-4">Designer Members</h2>
+    {/* Header Row */}
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div>
+        <h2 style={{ fontSize: "1.6rem", fontWeight: "900", color: "#111", margin: "0 0 4px", letterSpacing: "-0.02em" }}>
+          Designer Members
+        </h2>
+        <div style={{ width: "40px", height: "3px", background: "#111", borderRadius: "2px" }} />
+      </div>
+      <button
+        onClick={() => setShowAdminForm(true)}
+        style={{ background: "#111", color: "#fff", border: "2px solid #111", padding: "10px 20px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
+      >
+        + Add Designer
+      </button>
+    </div>
 
-            <button
-              onClick={() => setShowAdminForm(true)}
-              className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 mb-4 cursor-pointer"
-            >
-              Add Designer
-            </button>
+    {/* Grid */}
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "16px" }}>
+      {admins.map((admin) => (
+        <div
+          key={admin.id}
+          style={{ background: "#fff", border: "1px solid #ececec", borderRadius: "10px", overflow: "hidden", boxShadow: "0 1px 10px rgba(0,0,0,0.07)", transition: "box-shadow 0.2s, transform 0.2s" }}
+          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,0,0,0.13)"; e.currentTarget.style.transform = "translateY(-3px)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 1px 10px rgba(0,0,0,0.07)"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
 
-            <div className="grid grid-cols-3 gap-6">
-              {admins.map((admin) => (
-                <div
-                  key={admin.id}
-                  className="bg-white border rounded-lg shadow hover:shadow-lg transition p-4"
-                >
+          {/* Image */}
+          <div style={{ position: "relative", height: "180px", overflow: "hidden", background: "#f0f0f0" }}>
+            <img
+              src={admin.image}
+              alt={admin.name}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+            {/* Dark overlay at bottom */}
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "60px", background: "linear-gradient(to top, rgba(0,0,0,0.55), transparent)" }} />
+            {/* Name on image */}
+            <h3 style={{ position: "absolute", bottom: "10px", left: "14px", color: "#fff", fontSize: "1rem", fontWeight: "800", margin: 0, letterSpacing: "-0.01em", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>
+              {admin.name}
+            </h3>
+          </div>
 
-                  {/* Image */}
-                  <img
-                    src={admin.image}
-                    alt={admin.name}
-                    className="w-full h-40 object-cover rounded"
-                  />
+          {/* Body */}
+          <div style={{ padding: "14px 16px" }}>
 
-                  {/* Name */}
-                  <h3 className="text-xl font-bold mt-3">{admin.name}</h3>
+            {/* About */}
+            <p style={{ fontSize: "12px", color: "#666", lineHeight: "1.6", margin: "0 0 12px" }}>
+              {admin.about}
+            </p>
 
-                  {/* About */}
-                  <p className="text-gray-600 text-sm mt-1">
-                    {admin.about}
-                  </p>
-
-                  {/* Details */}
-                  <div className="text-sm mt-3 space-y-1">
-                    <p><strong>Email:</strong> {admin.email}</p>
-                    <p><strong>Phone:</strong> {admin.phone}</p>
-                    <p><strong>Address:</strong> {admin.address}</p>
-                  </div>
-
-                </div>
-              ))}
+            <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px", display: "flex", flexDirection: "column", gap: "5px" }}>
+              <div style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}>
+                <span style={{ fontSize: "10px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase", color: "#999", minWidth: "52px", paddingTop: "1px" }}>Email</span>
+                <span style={{ fontSize: "12px", color: "#222", fontWeight: "500" }}>{admin.email}</span>
+              </div>
+              <div style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}>
+                <span style={{ fontSize: "10px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase", color: "#999", minWidth: "52px", paddingTop: "1px" }}>Phone</span>
+                <span style={{ fontSize: "12px", color: "#222", fontWeight: "500" }}>{admin.phone}</span>
+              </div>
+              <div style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}>
+                <span style={{ fontSize: "10px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase", color: "#999", minWidth: "52px", paddingTop: "1px" }}>Address</span>
+                <span style={{ fontSize: "12px", color: "#222", fontWeight: "500" }}>{admin.address}</span>
+              </div>
             </div>
 
-          </>
-        )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+)}
 
         {/* Add Admin Modal */}
         {showAdminForm && (
