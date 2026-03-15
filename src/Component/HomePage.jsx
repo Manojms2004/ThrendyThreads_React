@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FiSearch, FiLogOut } from "react-icons/fi";
 import { FaChevronLeft, FaChevronRight, FaStar, FaRegHeart } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
-
+import axios from "axios";
 import Contect from "./Contact";
 import Footer from "./Footer";
 
@@ -13,28 +13,7 @@ const images = [
   "https://images.pexels.com/photos/914930/pexels-photo-914930.jpeg"
 ];
 
-const categories = [
-  {
-    name: "Ritu Kumar",
-    img: "https://images.pexels.com/photos/5692479/pexels-photo-5692479.jpeg",
-    path: "/Rithu"
-  },
-  {
-    name: "Anita Dongre",
-    img: "https://images.pexels.com/photos/3738087/pexels-photo-3738087.jpeg",
-    path: "/Anita"
-  },
-  {
-    name: "Rohit Bal",
-    img: "https://images.pexels.com/photos/10509860/pexels-photo-10509860.jpeg",
-    path: "/Rohit"
-  },
-  {
-    name: "Neeta Lulla",
-    img: "https://images.pexels.com/photos/5908822/pexels-photo-5908822.jpeg",
-    path: "/Neeta"  // IMPORTANT
-  }
-];
+
 
 function MarqueeText({ text }) {
   const repeated = Array(30).fill(text).join(" • ");
@@ -86,10 +65,10 @@ function StoreLocatorBanner() {
 
 export default function HomePage() {
   const navigate = useNavigate();
-   const [showImg, setImg] = useState(0);
+  const [showImg, setImg] = useState(0);
   const [showContect, setShowContect] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-
+  const scrollRef = useRef(null);
   const dropdownRef = useRef(null);
 
   const handleLogout = () => {
@@ -97,6 +76,45 @@ export default function HomePage() {
     localStorage.removeItem("user");
     navigate("/login");
   };
+
+  const [categories, setCategories] = useState([]);
+
+  const scrollLeft = () => {
+    scrollRef.current.scrollBy({
+      left: -300,
+      behavior: "smooth"
+    });
+  };
+
+  const scrollRight = () => {
+    scrollRef.current.scrollBy({
+      left: 300,
+      behavior: "smooth"
+    });
+  };
+
+  const fetchDesigners = async () => {
+    try {
+      const res = await axios.get(
+        "https://localhost:44332/api/Designer/GetAllDesigners"
+      );
+
+      const designers = res.data.map((d) => ({
+        name: d.designerName,
+        img: `data:image/jpeg;base64,${d.designerImage}`,
+        path: `/designer/${d.designerId}`
+      }));
+
+      setCategories(designers);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDesigners();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -257,32 +275,68 @@ export default function HomePage() {
 
       {/* Categories */}
       <div className="py-8 px-6">
-        {/* Centered Heading */}
+
+        <style>
+          {`
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  `}
+        </style>
         <h2 className="text-4xl font-semibold mb-8 text-center">
           Our Designers
         </h2>
 
-        {/* Cards Container */}
-        <div className="flex flex-wrap justify-center gap-20">
-          {categories.map((cat, i) => (
-            <div
-              key={i}
-              onClick={() => navigate(cat.path)}
-              className="cursor-pointer bg-white rounded-2xl shadow-lg p-6 w-60 text-center 
-                   hover:shadow-2xl hover:-translate-y-2 transition duration-300"
-            >
-              <img
-                src={cat.img}
-                alt={cat.name}
-                className="w-28 h-28 mx-auto rounded-xl object-cover"
-              />
+        <div className="relative">
 
-              <p className="mt-4 font-semibold text-lg">
-                {cat.name}
-              </p>
-            </div>
-          ))}
+          {/* Left Arrow */}
+          <button
+            onClick={scrollLeft}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black text-white p-3 rounded-full shadow hover:bg-gray-800"
+          >
+            <FaChevronLeft />
+          </button>
+
+          {/* Scroll Container */}
+          <div
+            ref={scrollRef}
+            className="flex justify-center gap-16 overflow-x-auto scroll-smooth px-10 no-scrollbar w-full"
+          >
+            {categories.map((cat, i) => (
+              <div
+                key={i}
+                onClick={() => navigate(cat.path)}
+                className="min-w-[240px] flex-shrink-0 cursor-pointer bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center 
+hover:shadow-xl hover:-translate-y-2 transition duration-300"
+              >
+                <img
+                  src={cat.img}
+                  alt={cat.name}
+                  className="w-28 h-28 mx-auto rounded-xl object-cover"
+                />
+
+                <p className="mt-4 font-semibold text-lg">
+                  {cat.name}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Right Arrow */}
+          <button
+            onClick={scrollRight}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black text-white p-3 rounded-full shadow hover:bg-gray-800"
+          >
+            <FaChevronRight />
+          </button>
+
         </div>
+
       </div>
       <div className="px-8 mt-5">
 

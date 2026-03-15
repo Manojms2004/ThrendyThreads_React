@@ -1,12 +1,13 @@
-// src/Components/RituDesigner.jsx
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import ShopByOccasion from "../ShopByOccasion";
-
-export default function RituDesigner({ wishlist, toggleWishlist }) {
+import { useParams } from "react-router-dom";
+import axios from "axios";
+export default function DesignerPage({ wishlist, toggleWishlist }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [extraProducts, setExtraProducts] = useState([]);
-
+  const { id } = useParams();
+  const [designer, setDesigner] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     img: "",
@@ -14,9 +15,25 @@ export default function RituDesigner({ wishlist, toggleWishlist }) {
     category: "cotton",
   });
 
-   useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    const fetchDesigner = async () => {
+      try {
+        const res = await axios.get(
+          `https://localhost:44332/api/Designer/GetDesignerById/${id}`
+        );
+
+        setDesigner(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchDesigner();
+  }, [id]);
 
   const handleAddPro = () => {
     setIsAdmin(true);
@@ -53,8 +70,8 @@ export default function RituDesigner({ wishlist, toggleWishlist }) {
       {/* HERO BANNER */}
       <div style={{ position: "relative", width: "100%", height: "320px", overflow: "hidden", background: "#111" }}>
         <img
-          src="https://images.pexels.com/photos/5692479/pexels-photo-5692479.jpeg"
-          alt="Ritu Kumar"
+          src={`data:image/jpeg;base64,${designer?.designerImage}`}
+          alt="Desinger"
           style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.35, display: "block" }}
         />
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 40px" }}>
@@ -62,7 +79,7 @@ export default function RituDesigner({ wishlist, toggleWishlist }) {
             Featured Designer
           </span>
           <h1 style={{ fontSize: "3rem", fontWeight: "900", color: "#fff", margin: "0 0 8px", lineHeight: "1.1", letterSpacing: "-0.02em" }}>
-            Ritu Kumar
+            {designer?.designerName}
           </h1>
           <p style={{ fontSize: "15px", color: "#ddd", margin: 0, fontWeight: "400", letterSpacing: "0.03em" }}>
             Pioneer of Indian Couture & Traditional Textile Revival
@@ -81,8 +98,8 @@ export default function RituDesigner({ wishlist, toggleWishlist }) {
           {/* Left — Photo */}
           <div style={{ width: "220px", flexShrink: 0, background: "#111", position: "relative" }}>
             <img
-              src="https://images.pexels.com/photos/5692479/pexels-photo-5692479.jpeg"
-              alt="Ritu Kumar"
+             src={`data:image/jpeg;base64,${designer?.designerImage}`}
+              alt="Designer"
               style={{ width: "100%", height: "100%", minHeight: "280px", objectFit: "cover", display: "block", opacity: 0.85 }}
             />
             <div style={{ position: "absolute", bottom: "14px", left: "14px", right: "14px" }}>

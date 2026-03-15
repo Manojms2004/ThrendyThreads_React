@@ -8,7 +8,7 @@ import HomePage from "./HomePage";
 import LoginPage from "./LoginPage";
 import SignupPage from "./SignupPage";
 import AnitaDongre from "./AnitaDongre";
-import RituDesigner from "./DesignerComponents/DesignerPage";
+import DesignerPage from "./DesignerComponents/DesignerPage";
 import LocateStore from "./LocateStore";
 import Contect from "./Contact";
 import Whishlist from "./Whishlist";
@@ -66,25 +66,14 @@ const RoutingPage = () => {
                 />
 
                 <Route
-                    path="/Rithu"
+                    path="/designer/:id"
                     element={
-                        <RituDesigner
+                        <DesignerPage
                             wishlist={wishlist}
                             toggleWishlist={toggleWishlist}
                         />
                     }
                 />
-
-                <Route
-                    path="/ritu"
-                    element={
-                        <RituDesigner
-                            wishlist={wishlist}
-                            toggleWishlist={toggleWishlist}
-                        />
-                    }
-                />
-
                 <Route
                     path="/product/:id"
                     element={
