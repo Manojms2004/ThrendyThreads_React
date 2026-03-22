@@ -135,6 +135,65 @@ export default function HomePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // const [products, setProducts] = useState([]);
+  const [liked, setLiked] = useState({});
+
+  const products = [
+    {
+      productId: 1,
+      productName: "Bridal Lehenga",
+      cost: 25000,
+      rating: 4.8,
+      quantity: 5,
+      productImage: null,
+      imageUrl: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400"
+    },
+    {
+      productId: 2,
+      productName: "Designer Saree",
+      cost: 15000,
+      rating: 4.5,
+      quantity: 10,
+      productImage: null,
+      imageUrl: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400"
+    },
+    {
+      productId: 3,
+      productName: "Anarkali Suit",
+      cost: 8999,
+      rating: 4.3,
+      quantity: 8,
+      productImage: null,
+      imageUrl: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=400"
+    },
+    {
+      productId: 4,
+      productName: "Floral Gown",
+      cost: 12500,
+      rating: 4.6,
+      quantity: 3,
+      productImage: null,
+      imageUrl: "https://images.unsplash.com/photo-1520975916090-3105956dac38?w=400"
+    },
+
+  ];
+  useEffect(() => {
+    const fetchRecentProducts = async () => {
+      try {
+        const res = await axios.get("https://localhost:44332/api/Product/GetRecentProducts");
+        setProducts(res.data);
+      } catch (error) {
+        console.error("Failed to fetch recent products", error);
+      }
+    };
+    fetchRecentProducts();
+  }, []);
+
+  const toggleLike = (id) => {
+    setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+
   return (
     <div className="relative">
 
@@ -292,37 +351,43 @@ export default function HomePage() {
           Our Designers
         </h2>
 
-        <div className="relative">
+        <div className="relative px-10">
 
           {/* Left Arrow */}
           <button
             onClick={scrollLeft}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black text-white p-3 rounded-full shadow hover:bg-gray-800"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md hover:bg-gray-800 transition"
           >
-            <FaChevronLeft />
+            <FaChevronLeft size={12} />
           </button>
 
           {/* Scroll Container */}
           <div
             ref={scrollRef}
-            className="flex justify-center gap-16 overflow-x-auto scroll-smooth px-10 no-scrollbar w-full"
+            className="flex gap-20 overflow-x-auto scroll-smooth no-scrollbar"
           >
             {categories.map((cat, i) => (
               <div
                 key={i}
                 onClick={() => navigate(cat.path)}
-                className="min-w-[240px] flex-shrink-0 cursor-pointer bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center 
-hover:shadow-xl hover:-translate-y-2 transition duration-300"
+                className="min-w-[180px] max-w-[180px] flex-shrink-0 cursor-pointer bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
               >
-                <img
-                  src={cat.img}
-                  alt={cat.name}
-                  className="w-28 h-28 mx-auto rounded-xl object-cover"
-                />
+                {/* Image — full card width */}
+                <div className="w-full h-[160px] overflow-hidden bg-gray-100 p-2">
+                  <img
+                    src={cat.img}
+                    alt={cat.name}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform rounded-2xl duration-500"
+                  />
+                </div>
 
-                <p className="mt-4 font-semibold text-lg">
-                  {cat.name}
-                </p>
+                {/* Name */}
+                <div className="py-2.5 px-3 bg-white border-t border-gray-100">
+                  <p className="text-sm font-semibold text-gray-900 text-center tracking-wide truncate">
+                    {cat.name}
+                  </p>
+                </div>
+
               </div>
             ))}
           </div>
@@ -330,9 +395,9 @@ hover:shadow-xl hover:-translate-y-2 transition duration-300"
           {/* Right Arrow */}
           <button
             onClick={scrollRight}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black text-white p-3 rounded-full shadow hover:bg-gray-800"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md hover:bg-gray-800 transition"
           >
-            <FaChevronRight />
+            <FaChevronRight size={12} />
           </button>
 
         </div>
@@ -345,126 +410,76 @@ hover:shadow-xl hover:-translate-y-2 transition duration-300"
           Recently Added Product
         </h2>
 
-        <div className="flex justify-around space-x-4 overflow-x-auto scroll-smooth custom-scrollbar">
+        <div className="flex justify-around gap-4 overflow-x-auto pb-2 mt-10 scroll-smooth"
+          style={{ scrollbarWidth: "thin", scrollbarColor: "#d1d5db transparent" }}
+        >
+          {products.map((product) => {
+            const id = product.productId || product.id;
+            const name = product.productName || product.name || "Product";
+            const price = product.cost || product.price || product.productPrice || 0;
+            const rating = product.rating || 4.5;
+            const quantity = product.quantity || product.productQuantity || 0;
+            const imageSrc = product.productImage || product.image
+              ? `data:image/jpeg;base64,${product.productImage || product.image}`
+              : "https://images.unsplash.com/photo-1520975916090-3105956dac38";
 
-          {/* Product Card 1 */}
-          <div className="min-w-[250px] border rounded-xl shadow-sm bg-white p-2 hover:shadow-lg transition-all duration-300">
+            return (
+              <div
+                key={id}
+                className="min-w-[230px] max-w-[230px] bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col"
+              >
+                {/* Image */}
+                <div className="relative overflow-hidden h-[200px] bg-gray-50">
+                  <img
+                    src={imageSrc}
+                    alt={name}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  />
 
-            <div className="relative overflow-hidden rounded-lg h-[300px]">
-              <img
-                src="https://images.unsplash.com/photo-1520975916090-3105956dac38"
-                alt="Product"
-                className="w-full h-full object-cover transition-transform hover:scale-110"
-              />
+                  {/* Like Button */}
+                  <button
+                    onClick={() => toggleLike(id)}
+                    className="absolute top-2 right-2 bg-white border border-gray-200 p-1.5 rounded-full shadow-sm hover:scale-110 transition-transform"
+                  >
+                    {liked[id]
+                      ? <FaHeart className="text-gray-900 text-xs" />
+                      : <FaRegHeart className="text-gray-400 text-xs" />
+                    }
+                  </button>
 
-              <button className="absolute top-2 right-2 bg-white p-2 rounded-full shadow">
-                <FaRegHeart />
-              </button>
-            </div>
+                  {/* Qty Badge */}
+                  {quantity > 0 && (
+                    <div className="absolute bottom-2 left-2 bg-black text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                      Qty: {quantity}
+                    </div>
+                  )}
+                </div>
 
-            <div className="p-2">
-              <p className="font-medium">Floral Designer Gown</p>
-              <p className="text-red-600 font-semibold">
-                ₹2,999
-              </p>
-              <div className="flex items-center text-yellow-500 text-sm">
-                <FaStar className="mr-1" />
-                4.5
+                {/* Info */}
+                <div className="p-3 flex flex-col gap-1.5 flex-1">
+
+                  <p className="text-sm font-semibold text-gray-900 leading-tight line-clamp-1">
+                    {name}
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold text-gray-900">₹{Number(price).toLocaleString()}</p>
+                    <div className="flex items-center gap-0.5 text-gray-500">
+                      <FaStar className="text-gray-800 text-[10px]" />
+                      <span className="text-[11px] font-medium text-gray-600">{rating}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-1 border-t border-gray-100 pt-2">
+                    <button className="w-full bg-gray-900 text-white text-xs font-semibold py-2 rounded-lg hover:bg-black transition-colors duration-200 tracking-wide">
+                      View
+                    </button>
+                  </div>
+
+                </div>
               </div>
-              <button className="mt-3 w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition duration-300">
-                View
-              </button>
-            </div>
-          </div>
-
-          {/* Product Card 2 */}
-          <div className="min-w-[250px] border rounded-xl shadow-sm bg-white p-2 hover:shadow-lg transition-all duration-300">
-
-            <div className="relative overflow-hidden rounded-lg h-[300px]">
-              <img
-                src="https://images.unsplash.com/photo-1520975916090-3105956dac38"
-                alt="Product"
-                className="w-full h-full object-cover transition-transform hover:scale-110"
-              />
-
-              <button className="absolute top-2 right-2 bg-white p-2 rounded-full shadow">
-                <FaRegHeart />
-              </button>
-            </div>
-
-            <div className="p-2">
-              <p className="font-medium">Floral Designer Gown</p>
-              <p className="text-red-600 font-semibold">
-                ₹2,999
-              </p>
-              <div className="flex items-center text-yellow-500 text-sm">
-                <FaStar className="mr-1" />
-                4.5
-              </div>
-              <button className="mt-3 w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition duration-300">
-                View
-              </button>
-            </div>
-          </div>
-          {/* Product Card 2 */}
-          <div className="min-w-[250px] border rounded-xl shadow-sm bg-white p-2 hover:shadow-lg transition-all duration-300">
-
-            <div className="relative overflow-hidden rounded-lg h-[300px]">
-              <img
-                src="https://images.unsplash.com/photo-1520975916090-3105956dac38"
-                alt="Product"
-                className="w-full h-full object-cover transition-transform hover:scale-110"
-              />
-
-              <button className="absolute top-2 right-2 bg-white p-2 rounded-full shadow">
-                <FaRegHeart />
-              </button>
-            </div>
-
-            <div className="p-2">
-              <p className="font-medium">Floral Designer Gown</p>
-              <p className="text-red-600 font-semibold">
-                ₹2,999
-              </p>
-              <div className="flex items-center text-yellow-500 text-sm">
-                <FaStar className="mr-1" />
-                4.5
-              </div>
-              <button className="mt-3 w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition duration-300">
-                View
-              </button>
-            </div>
-          </div>
-          {/* Product Card 2 */}
-          <div className="min-w-[250px] border rounded-xl shadow-sm bg-white p-2 hover:shadow-lg transition-all duration-300">
-
-            <div className="relative overflow-hidden rounded-lg h-[300px]">
-              <img
-                src="https://images.unsplash.com/photo-1520975916090-3105956dac38"
-                alt="Product"
-                className="w-full h-full object-cover transition-transform hover:scale-110"
-              />
-
-              <button className="absolute top-2 right-2 bg-white p-2 rounded-full shadow">
-                <FaRegHeart />
-              </button>
-            </div>
-
-            <div className="p-2">
-              <p className="font-medium">Floral Designer Gown</p>
-              <p className="text-red-600 font-semibold">
-                ₹2,999
-              </p>
-              <div className="flex items-center text-yellow-500 text-sm">
-                <FaStar className="mr-1" />
-                4.5
-              </div>
-              <button className="mt-3 w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition duration-300">
-                View
-              </button>
-            </div>
-          </div>
-
+            );
+          })}
         </div>
       </div>
 
