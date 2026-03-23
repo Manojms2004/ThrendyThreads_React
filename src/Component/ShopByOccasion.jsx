@@ -1,26 +1,63 @@
-// src/Components/ShopByOccasion.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaStar, FaHeart, FaRegHeart } from "react-icons/fa";
-import { allProducts } from "./ProductsData";
+import axios from "axios";
 
 export default function ShopByOccasion({
   wishlist = [],
-  toggleWishlist = () => {},
+  toggleWishlist = () => { },
   extraProducts = [],
-  designer = null,
+  designerId,
+
 }) {
   const [selectedCategory, setSelectedCategory] = useState("cotton");
+  const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
-  const mergedProducts = [...allProducts, ...extraProducts];
+  /* FETCH API */
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        console.log("Calling API...");
+        console.log("DesignerId:", designerId);
 
-  const productsToShow = mergedProducts.filter((product) => {
-    if (designer) {
-      return product.designer === designer && product.category === selectedCategory;
+        const res = await axios.get(
+          `https://localhost:44332/api/Product/GetProductsByDesignerId/${designerId}`
+        );
+
+        console.log("API RESPONSE:", res.data);
+
+        const mapped = res.data.map((p) => ({
+          id: p.productId,
+          name: p.productName,
+          img:
+            p.productImage && p.productImage !== "undefined"
+              ? `data:image/jpeg;base64,${p.productImage}`
+              : "https://via.placeholder.com/300",
+          finalPrice: p.price,
+          category: p.category?.trim().toLowerCase(),
+          rating: 4.5,
+        }));
+
+        setProducts(mapped);
+
+      } catch (err) {
+        console.error("API ERROR:", err);
+      }
+    };
+
+    if (designerId) {
+      fetchProducts();
+    } else {
+      console.log("DesignerId missing ");
     }
-    return !product.designer && product.category === selectedCategory;
-  });
+
+  }, [designerId]);
+
+  /*  FILTER ONLY API DATA */
+  // const productsToShow = products.filter(
+  //   (product) => product.category === selectedCategory
+  // );
 
   const formatPrice = (amount) =>
     new Intl.NumberFormat("en-IN", {
@@ -33,14 +70,14 @@ export default function ShopByOccasion({
     <div style={{ width: "100%", background: "#fff", padding: "8px 0", fontFamily: "sans-serif" }}>
 
       {/* TITLE */}
-      {!designer && (
+      {!designerId && (
         <h2 style={{ fontSize: "1.4rem", fontWeight: "800", color: "#111", marginBottom: "16px", letterSpacing: "-0.01em" }}>
           Shop by Occasion
         </h2>
       )}
 
       {/* CATEGORY BUTTONS */}
-      <div style={{ display: "flex",justifyContent:"center", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
         {["cotton", "banarasi", "wedding"].map((cat) => (
           <button
             key={cat}
@@ -65,14 +102,14 @@ export default function ShopByOccasion({
       </div>
 
       {/* PRODUCTS GRID */}
-      <div style={{ maxHeight: "580px", paddingRight: "4px",padding:"20px" }}>
-        {productsToShow.length === 0 ? (
+      <div style={{ maxHeight: "580px", paddingRight: "4px", padding: "20px" }}>
+        {products.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 0", color: "#999", fontSize: "13px", fontWeight: "500" }}>
             No products found in this category.
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "15px" }}>
-            {productsToShow.map((product) => (
+            {products.map((product) => (
               <div
                 key={product.id}
                 style={{ background: "#fff", border: "1px solid #ececec", borderRadius: "8px", overflow: "hidden", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", transition: "box-shadow 0.2s, transform 0.2s" }}
@@ -82,22 +119,18 @@ export default function ShopByOccasion({
                 {/* IMAGE */}
                 <div
                   style={{ position: "relative", height: "240px", overflow: "hidden", cursor: "pointer", background: "#f5f5f5" }}
-                  onClick={() => navigate(`/product/${product.id}`, { state: { extraProducts } })}
+                  onClick={() => navigate(`/product/${product.id}`)}
                 >
                   <img
                     src={product.img}
                     alt={product.name}
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/300";
+                    }}
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.35s" }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.07)"}
                     onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
                   />
-
-                  {/* Discount Badge */}
-                  {product.discount && (
-                    <span style={{ position: "absolute", top: "10px", left: "10px", background: "#111", color: "#fff", fontSize: "10px", fontWeight: "700", padding: "3px 8px", borderRadius: "3px", letterSpacing: "0.08em" }}>
-                      {product.discount} OFF
-                    </span>
-                  )}
 
                   {/* Wishlist */}
                   <button
@@ -125,15 +158,8 @@ export default function ShopByOccasion({
                     </span>
                   </div>
 
-                  {product.oldPrice && (
-                    <span style={{ fontSize: "11px", color: "#bbb", textDecoration: "line-through" }}>
-                      {formatPrice(product.oldPrice)}
-                    </span>
-                  )}
-
-                  {/* Quick View Button */}
                   <button
-                    onClick={() => navigate(`/product/${product.id}`, { state: { extraProducts } })}
+                    onClick={() => navigate(`/product/${product.id}`)}
                     style={{ marginTop: "10px", width: "100%", background: "#111", color: "#fff", border: "2px solid #111", padding: "7px", fontSize: "10px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
                   >
                     View Product

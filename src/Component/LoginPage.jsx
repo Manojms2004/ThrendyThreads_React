@@ -40,11 +40,24 @@ function LoginPage() {
       };
 
       const response = await axios.post(
-        "https://localhost:44332/api/Login/Login",
+        "https://localhost:44332/api/Auth/login",
         payload
       );
 
       if (response.data) {
+        const { token, user } = response.data;
+
+        // ✅ STORE TOKEN
+        localStorage.setItem("token", token);
+
+        // ✅ STORE USER DATA
+        localStorage.setItem("user", JSON.stringify(user));
+
+        // ✅ SET DEFAULT HEADER FOR FUTURE REQUESTS
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${token}`;
+
         toast.success("Login Successful");
 
         setTimeout(() => {
@@ -111,7 +124,7 @@ function LoginPage() {
 
               {!isPasswordValid && (
                 <p className="text-red-500 text-sm mb-2">
-                 Password should not contain symbols.
+                  Password should not contain symbols.
                 </p>
               )}
 

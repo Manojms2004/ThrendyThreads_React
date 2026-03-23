@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ShopByOccasion from "../ShopByOccasion";
 import { useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 export default function DesignerPage({ wishlist, toggleWishlist }) {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -41,31 +42,82 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const handleAddProduct = () => {
-    if (!formData.name || !formData.img || !formData.price) {
-      alert("Fill all fields");
+  const handleImageUploadProduct = (file) => {
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const base64 = reader.result.split(",")[1];
+
+      setFormData((prev) => ({
+        ...prev,
+        img: base64
+      }));
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddProduct = async () => {
+    if (!formData.name || !formData.img || !formData.price || !formData.category) {
+      toast.error("Please fill all fields");
       return;
     }
-    const newProduct = {
-      id: Date.now(),
-      name: formData.name,
-      img: formData.img,
-      finalPrice: Number(formData.price),
-      rating: 4.5,
-      reviews: 1,
-      category: formData.category,
-      designer: "ritu",
-    };
-    setExtraProducts([...extraProducts, newProduct]);
-    setFormData({ name: "", img: "", price: "", category: "cotton" });
-    setShowModal(false);
+
+    try {
+      const payload = {
+        productId: 0,
+        productName: formData.name,
+        productImage: formData.img,
+        price: Number(formData.price),
+        category: formData.category,
+        designerId: id,
+        cartId: 0
+      };
+
+      await axios.post(
+        "https://localhost:44332/api/Product/AddProduct",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      toast.success("Product added successfully");
+
+      // refresh products
+      // fetchProducts();
+
+      // reset
+      setFormData({
+        name: "",
+        img: "",
+        price: "",
+        category: "cotton"
+      });
+
+      setShowModal(false);
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to add product");
+    }
   };
 
   return (
     <div style={{ background: "#f9f8f6", minHeight: "100vh", fontFamily: "sans-serif" }}>
+
+       <ToastContainer position="top-right" autoClose={3000} />
 
       {/* HERO BANNER */}
       <div style={{ position: "relative", width: "100%", height: "320px", overflow: "hidden", background: "#111" }}>
@@ -98,7 +150,7 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
           {/* Left — Photo */}
           <div style={{ width: "220px", flexShrink: 0, background: "#111", position: "relative" }}>
             <img
-             src={`data:image/jpeg;base64,${designer?.designerImage}`}
+              src={`data:image/jpeg;base64,${designer?.designerImage}`}
               alt="Designer"
               style={{ width: "100%", height: "100%", minHeight: "280px", objectFit: "cover", display: "block", opacity: 0.85 }}
             />
@@ -174,7 +226,7 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
           wishlist={wishlist}
           toggleWishlist={toggleWishlist}
           extraProducts={extraProducts}
-          designer="ritu"
+          designerId={id}
         />
       </div>
 
@@ -195,7 +247,7 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
 
             <input
               type="file" accept="image/*"
-              onChange={(e) => setFormData({ ...formData, img: URL.createObjectURL(e.target.files[0]) })}
+              onChange={(e) => handleImageUploadProduct(e.target.files[0])}
               style={{ width: "100%", border: "1.5px solid #ddd", borderRadius: "4px", padding: "9px 12px", fontSize: "13px", color: "#555", outline: "none", marginBottom: "10px", boxSizing: "border-box", cursor: "pointer" }}
             />
 

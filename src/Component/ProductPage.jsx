@@ -1,5 +1,5 @@
 // src/Components/ProductPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { allProducts } from "./ProductsData";
 import { FaStar, FaHeart, FaRegHeart, FaArrowLeft, FaWhatsapp } from "react-icons/fa";
@@ -12,28 +12,40 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
   const [showForm, setShowForm] = useState(false);
   const [requestData, setRequestData] = useState({ name: "", phone: "", message: "" });
 
+  const [apiProduct, setApiProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch product from API
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    fetch(`https://localhost:44332/api/Product/GetProductById/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Product not found");
+        return res.json();
+      })
+      .then((data) => {
+        setApiProduct(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [id]);
+
   const mergedProducts = [
     ...allProducts,
     ...(location.state?.extraProducts || []),
   ];
 
-  const product = mergedProducts.find((p) => p.id === parseInt(id));
-
-  if (!product)
-    return (
-      <div style={{ padding: "2rem", fontSize: "1.2rem", color: "#111" }}>
-        Product not found.
-      </div>
-    );
-
-  const relatedProducts = mergedProducts
-    .filter((p) => {
-      if (product.designer) {
-        return p.category === product.category && p.designer === product.designer && p.id !== product.id;
-      }
-      return p.category === product.category && !p.designer && p.id !== product.id;
-    })
-    .slice(0, 4);
+  // Related products from local data by category
+  const relatedProducts = apiProduct
+    ? mergedProducts
+        .filter((p) => p.category?.toLowerCase() === apiProduct.category?.toLowerCase() && p.id !== parseInt(id))
+        .slice(0, 4)
+    : [];
 
   const formatPrice = (amount) =>
     new Intl.NumberFormat("en-IN", {
@@ -41,6 +53,23 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
       currency: "INR",
       maximumFractionDigits: 0,
     }).format(amount);
+
+  // Convert VARBINARY image to base64 src
+  const getImageSrc = (imageData) => {
+    if (!imageData) return null;
+    // If already a URL string
+    if (typeof imageData === "string" && imageData.startsWith("http")) return imageData;
+    // If base64 string
+    if (typeof imageData === "string") return `data:image/jpeg;base64,${imageData}`;
+    // If array of bytes
+    if (Array.isArray(imageData)) {
+      const bytes = new Uint8Array(imageData);
+      let binary = "";
+      bytes.forEach((b) => (binary += String.fromCharCode(b)));
+      return `data:image/jpeg;base64,${window.btoa(binary)}`;
+    }
+    return null;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -52,10 +81,32 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
       alert("Please enter Name and Phone Number");
       return;
     }
-    const finalMessage = `Hello,\n\nProduct: ${product.name}\nPrice: ₹${product.finalPrice}\nCategory: ${product.category}\n\nCustomer Name: ${requestData.name}\nPhone: ${requestData.phone}\n\nRequested Changes:\n${requestData.message || "No details provided"}\n\nThank you.`;
+    const finalMessage = `Hello,\n\nProduct: ${apiProduct.productName}\nPrice: ₹${apiProduct.price}\nCategory: ${apiProduct.category}\n\nCustomer Name: ${requestData.name}\nPhone: ${requestData.phone}\n\nRequested Changes:\n${requestData.message || "No details provided"}\n\nThank you.`;
     window.open(`https://wa.me/919876543210?text=${encodeURIComponent(finalMessage)}`, "_blank");
     setShowForm(false);
   };
+
+  // Loading State
+  if (loading) return (
+    <div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif", flexDirection: "column", gap: "12px", background: "#f5f5f5" }}>
+      <div style={{ width: "36px", height: "36px", border: "3px solid #eee", borderTop: "3px solid #111", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <p style={{ fontSize: "13px", color: "#999", fontWeight: "600", letterSpacing: "0.08em", textTransform: "uppercase" }}>Loading Product...</p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+
+  // Error State
+  if (error) return (
+    <div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif", flexDirection: "column", gap: "10px", background: "#f5f5f5" }}>
+      <p style={{ fontSize: "1rem", color: "#111", fontWeight: "700" }}>Failed to load product</p>
+      <p style={{ fontSize: "13px", color: "#999" }}>{error}</p>
+      <button onClick={() => navigate(-1)} style={{ marginTop: "10px", background: "#111", color: "#fff", border: "none", padding: "9px 20px", borderRadius: "4px", fontSize: "12px", fontWeight: "700", cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+        Go Back
+      </button>
+    </div>
+  );
+
+  const imgSrc = getImageSrc(apiProduct.productImage);
 
   return (
     <div style={{ background: "#f5f5f5", height: "100vh", overflow: "hidden", padding: "10px", fontFamily: "sans-serif", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
@@ -71,21 +122,27 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
       {/* Main Layout: 70% left + 30% right */}
       <div style={{ display: "flex", gap: "10px", flex: 1, overflow: "hidden" }}>
 
-        {/* LEFT — 70% — Product Image + Details */}
+        {/* LEFT — 70% */}
         <div style={{ width: "70%", display: "flex", gap: "10px", background: "#fff", borderRadius: "8px", boxShadow: "0 1px 8px rgba(0,0,0,0.08)", overflow: "hidden" }}>
 
           {/* Product Image */}
           <div style={{ width: "45%", position: "relative", background: "#eee", flexShrink: 0 }}>
-            <img
-              src={product.img}
-              alt={product.name}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
+            {imgSrc ? (
+              <img
+                src={imgSrc}
+                alt={apiProduct.productName}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            ) : (
+              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#bbb", fontSize: "13px" }}>
+                No Image
+              </div>
+            )}
             <button
-              onClick={() => toggleWishlist(product.id)}
+              onClick={() => toggleWishlist(apiProduct.productId)}
               style={{ position: "absolute", top: "10px", right: "10px", background: "#fff", border: "none", borderRadius: "50%", width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", cursor: "pointer" }}
             >
-              {wishlist.includes(product.id)
+              {wishlist.includes(apiProduct.productId)
                 ? <FaHeart style={{ color: "#111", fontSize: "15px" }} />
                 : <FaRegHeart style={{ color: "#999", fontSize: "15px" }} />}
             </button>
@@ -95,41 +152,44 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
           <div style={{ flex: 1, padding: "20px 18px", display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
             <span style={{ fontSize: "10px", fontWeight: "700", letterSpacing: "0.15em", textTransform: "uppercase", color: "#888", borderBottom: "2px solid #111", paddingBottom: "2px", width: "fit-content" }}>
-              {product.category}
+              {apiProduct.category}
             </span>
 
             <h1 style={{ fontSize: "1.5rem", fontWeight: "800", color: "#111", margin: "8px 0 6px", lineHeight: "1.2" }}>
-              {product.name}
+              {apiProduct.productName}
             </h1>
 
-            {/* Rating */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "40px" }}>
-              <span style={{ background: "#111", color: "#fff", padding: "3px 9px", borderRadius: "3px", fontSize: "11px", fontWeight: "700", display: "flex", alignItems: "center", gap: "4px" }}>
-                <FaStar size={9} /> {product.rating}
+            {/* Product ID Badge */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+              <span style={{ background: "#f0f0f0", color: "#555", padding: "3px 9px", borderRadius: "3px", fontSize: "11px", fontWeight: "600" }}>
+                Product ID: #{apiProduct.productId}
               </span>
-              <span style={{ fontSize: "11px", color: "#999" }}>({product.reviews} reviews)</span>
             </div>
 
-            <div style={{ borderTop: "1px solid #eee", paddingTop: "12px", marginBottom: "40px" }}>
+            <div style={{ borderTop: "1px solid #eee", paddingTop: "12px", marginBottom: "28px" }}>
               <div style={{ fontSize: "1.6rem", fontWeight: "800", color: "#111", lineHeight: "1" }}>
-                {formatPrice(product.finalPrice)}
+                {formatPrice(apiProduct.price)}
               </div>
-              {product.oldPrice && (
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "5px" }}>
-                  <span style={{ textDecoration: "line-through", color: "#bbb", fontSize: "13px" }}>
-                    {formatPrice(product.oldPrice)}
-                  </span>
-                  <span style={{ background: "#111", color: "#fff", fontSize: "10px", fontWeight: "700", padding: "2px 7px", borderRadius: "3px", letterSpacing: "0.08em" }}>
-                    {product.discount} OFF
-                  </span>
+            </div>
+
+            {/* Details Table */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
+              {[
+                ["Category", apiProduct.category],
+                ["Product Name", apiProduct.productName],
+                ["Price", formatPrice(apiProduct.price)],
+              ].map(([label, value]) => (
+                <div key={label} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  <span style={{ fontSize: "10px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#999", minWidth: "90px" }}>{label}</span>
+                  <span style={{ fontSize: "13px", fontWeight: "600", color: "#222" }}>{value}</span>
                 </div>
-              )}
+              ))}
             </div>
 
             {/* Buttons */}
-            <div style={{ display: "flex", gap: "8px" }}>
+            <div style={{ display: "flex", gap: "8px", marginTop: "auto" }}>
               <button
-                onClick={() => navigate("/checkout", { state: { product } })}
+                onClick={() => navigate("/checkout", { state: { product: apiProduct } })}
                 style={{ flex: 1, background: "#111", color: "#fff", border: "2px solid #111", padding: "10px 12px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
               >
                 Buy Now
@@ -161,12 +221,12 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
               <div
                 key={relProd.id}
                 onClick={() => navigate(`/product/${relProd.id}`, { state: { extraProducts: location.state?.extraProducts } })}
-                style={{height:"300px", cursor: "pointer", background: "#fff", borderRadius: "6px", overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.07)", border: "1px solid #ececec", display: "flex", gap: "0" }}
+                style={{ cursor: "pointer", background: "#fff", borderRadius: "6px", overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.07)", border: "1px solid #ececec", display: "flex" }}
               >
                 <img
                   src={relProd.img}
                   alt={relProd.name}
-                  style={{ width: "150px", height: "200px", objectFit: "cover", flexShrink: 0 }}
+                  style={{ width: "90px", height: "90px", objectFit: "cover", flexShrink: 0 }}
                 />
                 <div style={{ padding: "8px 10px", display: "flex", flexDirection: "column", justifyContent: "center", overflow: "hidden" }}>
                   <p style={{ fontSize: "12px", fontWeight: "600", color: "#222", margin: "0 0 4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
