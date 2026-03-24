@@ -23,7 +23,41 @@ import Silk from "./DesingsComponents/Silk";
 import SkirtsShorts from "./DesingsComponents/SkirtsShorts";
 import Checkout from "./Checkout";
 import About from "./About";
+import UserDashBoard from "./AdminDashBoardComponents/UserDashBoard";
+import DesignerDashBoard from "./AdminDashBoardComponents/DesignerDashboard";
+import { Navigate } from "react-router-dom";
 
+
+
+const ProtectedRoute = ({ children, allowedRole }) => {
+  let user = null;
+
+  try {
+    const storedUser = localStorage.getItem("user");
+    user = storedUser ? JSON.parse(storedUser) : null;
+  } catch (err) {
+    console.error("Invalid user in localStorage:", err);
+    localStorage.removeItem("user");
+    return <Navigate to="/login" />;
+  }
+
+  console.log("USER:", user);
+
+  if (!user) return <Navigate to="/login" />;
+
+  const role = user.role?.toLowerCase();
+
+  console.log("ROLE:", role);
+
+  // ✅ redirect if wrong route
+  if (allowedRole && role !== allowedRole.toLowerCase()) {
+    if (role === "admin") return <Navigate to="/adminDashboard" />;
+    if (role === "designer") return <Navigate to="/desingerDashboard" />;
+    if (role === "user") return <Navigate to="/userDashboard" />;
+  }
+
+  return children;
+};
 const RoutingPage = () => {
 
     const [wishlist, setWishlist] = useState(() => {
@@ -85,7 +119,32 @@ const RoutingPage = () => {
                 />
                 <Route path="/checkout" element={<Checkout />} />
 
-                <Route path="/adminDashboard" element={<AdminDashboard />} />
+                <Route
+  path="/adminDashboard"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <AdminDashboard />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/userDashboard"
+  element={
+    <ProtectedRoute allowedRole="user">
+      <UserDashBoard />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/desingerDashboard"
+  element={
+    <ProtectedRoute allowedRole="designer">
+      <DesignerDashBoard />
+    </ProtectedRoute>
+  }
+/>
 
                 <Route path="/locatestore" element={<LocateStore />} />
                 <Route path="/home/contact" element={<Contect />} />

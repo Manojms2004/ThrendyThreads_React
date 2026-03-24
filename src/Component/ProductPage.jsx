@@ -112,12 +112,30 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
     <div style={{ background: "#f5f5f5", height: "100vh", overflow: "hidden", padding: "10px", fontFamily: "sans-serif", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
       {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "#111", color: "#fff", border: "none", padding: "7px 14px", borderRadius: "4px", fontSize: "12px", fontWeight: "600", cursor: "pointer", marginBottom: "10px", letterSpacing: "0.05em", width: "fit-content" }}
-      >
-        <FaArrowLeft size={10} /> Back
-      </button>
+     <button
+       onClick={() => navigate(-1)}
+       style={{
+         position: "fixed",       // ✅ FIXED POSITION
+         top: "20px",             // distance from top
+         left: "20px",            // distance from left
+         zIndex: 1000,            // stay above all content
+         display: "inline-flex",
+         alignItems: "center",
+         gap: "6px",
+         background: "#111",
+         color: "#fff",
+         border: "none",
+         padding: "7px 14px",
+         borderRadius: "4px",
+         fontSize: "12px",
+         fontWeight: "600",
+         cursor: "pointer",
+         letterSpacing: "0.05em",
+         width: "fit-content"
+       }}
+     >
+       <FaArrowLeft size={10} /> Back
+     </button>
 
       {/* Main Layout: 70% left + 30% right */}
       <div style={{ display: "flex", gap: "10px", flex: 1, overflow: "hidden" }}>

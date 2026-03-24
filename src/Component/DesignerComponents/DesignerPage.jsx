@@ -3,6 +3,8 @@ import ShopByOccasion from "../ShopByOccasion";
 import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 export default function DesignerPage({ wishlist, toggleWishlist }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -15,6 +17,8 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
     price: "",
     category: "cotton",
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -118,6 +122,31 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
     <div style={{ background: "#f9f8f6", minHeight: "100vh", fontFamily: "sans-serif" }}>
 
        <ToastContainer position="top-right" autoClose={3000} />
+
+      <button
+  onClick={() => navigate('/home')}
+  style={{
+    position: "fixed",       // ✅ FIXED POSITION
+    top: "20px",             // distance from top
+    left: "20px",            // distance from left
+    zIndex: 1000,            // stay above all content
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    background: "#111",
+    color: "#fff",
+    border: "none",
+    padding: "7px 14px",
+    borderRadius: "4px",
+    fontSize: "12px",
+    fontWeight: "600",
+    cursor: "pointer",
+    letterSpacing: "0.05em",
+    width: "fit-content"
+  }}
+>
+  <FaArrowLeft size={10} /> Back
+</button>
 
       {/* HERO BANNER */}
       <div style={{ position: "relative", width: "100%", height: "320px", overflow: "hidden", background: "#111" }}>

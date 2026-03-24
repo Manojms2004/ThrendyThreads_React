@@ -193,6 +193,9 @@ export default function HomePage() {
     setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const handleViewClick = (id) =>{
+    navigate(`/product/${id}`)
+  }
 
   return (
     <div className="relative">
@@ -414,7 +417,7 @@ export default function HomePage() {
           style={{ scrollbarWidth: "thin", scrollbarColor: "#d1d5db transparent" }}
         >
           {products.map((product) => {
-            const id = product.productId || product.id;
+            const id = product.productId;
             const name = product.productName || product.name || "Product";
             const price = product.cost || product.price || product.productPrice || 0;
             const rating = product.rating || 4.5;
@@ -471,7 +474,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="mt-1 border-t border-gray-100 pt-2">
-                    <button className="w-full bg-gray-900 text-white text-xs font-semibold py-2 rounded-lg hover:bg-black transition-colors duration-200 tracking-wide">
+                    <button onClick={()=> handleViewClick(id)} className="w-full bg-gray-900 text-white text-xs font-semibold py-2 rounded-lg hover:bg-black transition-colors duration-200 tracking-wide cursor-pointer">
                       View
                     </button>
                   </div>
