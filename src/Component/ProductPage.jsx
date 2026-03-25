@@ -3,18 +3,56 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { allProducts } from "./ProductsData";
 import { FaStar, FaHeart, FaRegHeart, FaArrowLeft, FaWhatsapp } from "react-icons/fa";
-
+import { toast, ToastContainer } from "react-toastify";
+import axios from "axios";
 export default function ProductPage({ wishlist = [], toggleWishlist }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const designerId = location.state?.designerId;
 
   const [showForm, setShowForm] = useState(false);
   const [requestData, setRequestData] = useState({ name: "", phone: "", message: "" });
 
   const [apiProduct, setApiProduct] = useState(null);
+
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  console.log(designerId)
+
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      try {
+        if (!designerId) return;
+
+        const res = await axios.get(
+          `https://localhost:44332/api/Product/GetProductsByDesignerId/${designerId}`
+        );
+
+        const mapped = res.data
+          .filter(p => p.productId !== parseInt(id)) // remove current product
+          .map((p) => ({
+            id: p.productId,
+            name: p.productName,
+            img: p.productImage
+              ? `data:image/jpeg;base64,${p.productImage}`
+              : "https://via.placeholder.com/300",
+            finalPrice: p.price,
+            category: p.category?.trim().toLowerCase(),
+          }))
+          .slice(0, 4);
+
+        setRelatedProducts(mapped);
+
+      } catch (err) {
+        console.error("Related Products API ERROR:", err);
+      }
+    };
+
+    fetchRelatedProducts();
+  }, [designerId, id]);
 
   // Fetch product from API
   useEffect(() => {
@@ -40,12 +78,30 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
     ...(location.state?.extraProducts || []),
   ];
 
-  // Related products from local data by category
-  const relatedProducts = apiProduct
-    ? mergedProducts
-        .filter((p) => p.category?.toLowerCase() === apiProduct.category?.toLowerCase() && p.id !== parseInt(id))
-        .slice(0, 4)
-    : [];
+  const handleAddCart = async (productId) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user?.userId) {
+        toast.error("Please login first");
+        return;
+      }
+
+      const cartId = user.userId;
+
+      console.log(cartId)
+
+      const res = await axios.put(
+        `https://localhost:44332/api/Product/UpdateCart?productId=${productId}&cartId=${cartId}`
+      );
+
+      toast.success("Product added to cart");
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to add to cart");
+    }
+  };
+
 
   const formatPrice = (amount) =>
     new Intl.NumberFormat("en-IN", {
@@ -82,8 +138,9 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
       return;
     }
     const finalMessage = `Hello,\n\nProduct: ${apiProduct.productName}\nPrice: ₹${apiProduct.price}\nCategory: ${apiProduct.category}\n\nCustomer Name: ${requestData.name}\nPhone: ${requestData.phone}\n\nRequested Changes:\n${requestData.message || "No details provided"}\n\nThank you.`;
-    window.open(`https://wa.me/919876543210?text=${encodeURIComponent(finalMessage)}`, "_blank");
+    window.open(`https://wa.me/91${requestData.phone}?text=${encodeURIComponent(finalMessage)}`, "_blank");
     setShowForm(false);
+    setRequestData([])
   };
 
   // Loading State
@@ -111,31 +168,32 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
   return (
     <div style={{ background: "#f5f5f5", height: "100vh", overflow: "hidden", padding: "10px", fontFamily: "sans-serif", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
 
+      <ToastContainer position="top-right" autoClose={3000} />
       {/* Back Button */}
-     <button
-       onClick={() => navigate(-1)}
-       style={{
-         position: "fixed",       // ✅ FIXED POSITION
-         top: "20px",             // distance from top
-         left: "20px",            // distance from left
-         zIndex: 1000,            // stay above all content
-         display: "inline-flex",
-         alignItems: "center",
-         gap: "6px",
-         background: "#111",
-         color: "#fff",
-         border: "none",
-         padding: "7px 14px",
-         borderRadius: "4px",
-         fontSize: "12px",
-         fontWeight: "600",
-         cursor: "pointer",
-         letterSpacing: "0.05em",
-         width: "fit-content"
-       }}
-     >
-       <FaArrowLeft size={10} /> Back
-     </button>
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          position: "fixed",
+          top: "20px",
+          left: "20px",
+          zIndex: 1000,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "6px",
+          background: "#111",
+          color: "#fff",
+          border: "none",
+          padding: "7px 14px",
+          borderRadius: "4px",
+          fontSize: "12px",
+          fontWeight: "600",
+          cursor: "pointer",
+          letterSpacing: "0.05em",
+          width: "fit-content"
+        }}
+      >
+        <FaArrowLeft size={10} /> Back
+      </button>
 
       {/* Main Layout: 70% left + 30% right */}
       <div style={{ display: "flex", gap: "10px", flex: 1, overflow: "hidden" }}>
@@ -207,16 +265,16 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
             {/* Buttons */}
             <div style={{ display: "flex", gap: "8px", marginTop: "auto" }}>
               <button
-                onClick={() => navigate("/checkout", { state: { product: apiProduct } })}
+                onClick={() => handleAddCart(apiProduct.productId)}
                 style={{ flex: 1, background: "#111", color: "#fff", border: "2px solid #111", padding: "10px 12px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
               >
-                Buy Now
+                ADD TO CART
               </button>
               <button
                 onClick={() => setShowForm(true)}
                 style={{ flex: 1, background: "#fff", color: "#111", border: "2px solid #111", padding: "10px 12px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
               >
-                Request Change
+                Request Design Change
               </button>
             </div>
 

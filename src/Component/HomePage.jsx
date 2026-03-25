@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiSearch, FiLogOut } from "react-icons/fi";
 import { FaChevronLeft, FaChevronRight, FaStar, FaRegHeart } from "react-icons/fa";
@@ -77,6 +77,12 @@ export default function HomePage() {
     navigate("/login");
   };
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const imageSrc = user?.image
+  ? `data:image/jpeg;base64,${user.image}`
+  : "https://i.pravatar.cc/40";
+
   const [categories, setCategories] = useState([]);
 
   const scrollLeft = () => {
@@ -135,48 +141,10 @@ export default function HomePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [liked, setLiked] = useState({});
 
-  const products = [
-    {
-      productId: 1,
-      productName: "Bridal Lehenga",
-      cost: 25000,
-      rating: 4.8,
-      quantity: 5,
-      productImage: null,
-      imageUrl: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400"
-    },
-    {
-      productId: 2,
-      productName: "Designer Saree",
-      cost: 15000,
-      rating: 4.5,
-      quantity: 10,
-      productImage: null,
-      imageUrl: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400"
-    },
-    {
-      productId: 3,
-      productName: "Anarkali Suit",
-      cost: 8999,
-      rating: 4.3,
-      quantity: 8,
-      productImage: null,
-      imageUrl: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=400"
-    },
-    {
-      productId: 4,
-      productName: "Floral Gown",
-      cost: 12500,
-      rating: 4.6,
-      quantity: 3,
-      productImage: null,
-      imageUrl: "https://images.unsplash.com/photo-1520975916090-3105956dac38?w=400"
-    },
 
-  ];
   useEffect(() => {
     const fetchRecentProducts = async () => {
       try {
@@ -193,7 +161,7 @@ export default function HomePage() {
     setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleViewClick = (id) =>{
+  const handleViewClick = (id) => {
     navigate(`/product/${id}`)
   }
 
@@ -251,7 +219,7 @@ export default function HomePage() {
               className="flex items-center gap-3 cursor-pointer px-3 py-1.5 rounded-full hover:bg-gray-100 transition"
             >
               <img
-                src="https://i.pravatar.cc/40"
+                src={imageSrc}
                 alt="user"
                 className="w-9 h-9 rounded-full border-2 border-gray-200"
               />
@@ -474,7 +442,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="mt-1 border-t border-gray-100 pt-2">
-                    <button onClick={()=> handleViewClick(id)} className="w-full bg-gray-900 text-white text-xs font-semibold py-2 rounded-lg hover:bg-black transition-colors duration-200 tracking-wide cursor-pointer">
+                    <button onClick={() => handleViewClick(id)} className="w-full bg-gray-900 text-white text-xs font-semibold py-2 rounded-lg hover:bg-black transition-colors duration-200 tracking-wide cursor-pointer">
                       View
                     </button>
                   </div>

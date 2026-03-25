@@ -85,7 +85,7 @@ function SignupPage() {
       toast.success("Registered successfully");
 
       setTimeout(() => {
-        navigate("/Home");
+        navigate("/login");
       }, 1500);
 
     } catch (error) {

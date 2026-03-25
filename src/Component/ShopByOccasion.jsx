@@ -37,6 +37,7 @@ export default function ShopByOccasion({
           finalPrice: p.price,
           category: p.category?.trim().toLowerCase(),
           rating: 4.5,
+          designerId: p.designerId 
         }));
 
         setProducts(mapped);
@@ -119,7 +120,11 @@ export default function ShopByOccasion({
                 {/* IMAGE */}
                 <div
                   style={{ position: "relative", height: "240px", overflow: "hidden", cursor: "pointer", background: "#f5f5f5" }}
-                  onClick={() => navigate(`/product/${product.id}`)}
+                 onClick={() =>
+  navigate(`/product/${product.id}`, {
+    state: { designerId: product.designerId }
+  })
+}
                 >
                   <img
                     src={product.img}

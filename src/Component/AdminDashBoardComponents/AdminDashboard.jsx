@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router";
 export default function FashionDesignerDashboard() {
 
+  const navigate = useNavigate();
   const [activePage, setActivePage] = useState("dashboard");
   const [designs, setDesigns] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -194,6 +196,31 @@ export default function FashionDesignerDashboard() {
 
   return (
     <div className="flex h-screen bg-gray-100">
+
+      <button
+             onClick={() => navigate("/home")}
+             style={{
+               position: "fixed",     
+               bottom: "20px",            
+               left: "20px",           
+               zIndex: 1000,            
+               display: "inline-flex",
+               alignItems: "center",
+               gap: "6px",
+               background: "#111",
+               color: "#fff",
+               border: "none",
+               padding: "7px 14px",
+               borderRadius: "4px",
+               fontSize: "12px",
+               fontWeight: "600",
+               cursor: "pointer",
+               letterSpacing: "0.05em",
+               width: "fit-content"
+             }}
+           >
+             <FaArrowLeft size={10} /> Back
+           </button>
 
       <ToastContainer position="top-right" autoClose={3000} />
 

@@ -27,8 +27,6 @@ import UserDashBoard from "./AdminDashBoardComponents/UserDashBoard";
 import DesignerDashBoard from "./AdminDashBoardComponents/DesignerDashboard";
 import { Navigate } from "react-router-dom";
 
-
-
 const ProtectedRoute = ({ children, allowedRole }) => {
   let user = null;
 
@@ -41,15 +39,11 @@ const ProtectedRoute = ({ children, allowedRole }) => {
     return <Navigate to="/login" />;
   }
 
-  console.log("USER:", user);
-
   if (!user) return <Navigate to="/login" />;
 
   const role = user.role?.toLowerCase();
 
-  console.log("ROLE:", role);
-
-  // ✅ redirect if wrong route
+  // Role-based restriction (UNCHANGED)
   if (allowedRole && role !== allowedRole.toLowerCase()) {
     if (role === "admin") return <Navigate to="/adminDashboard" />;
     if (role === "designer") return <Navigate to="/desingerDashboard" />;
@@ -58,127 +52,132 @@ const ProtectedRoute = ({ children, allowedRole }) => {
 
   return children;
 };
+
 const RoutingPage = () => {
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("wishlist_sarees_v1")) || [];
+    } catch {
+      return [];
+    }
+  });
 
-    const [wishlist, setWishlist] = useState(() => {
-        try {
-            return JSON.parse(localStorage.getItem("wishlist_sarees_v1")) || [];
-        } catch {
-            return [];
-        }
-    });
+  useEffect(() => {
+    localStorage.setItem("wishlist_sarees_v1", JSON.stringify(wishlist));
+  }, [wishlist]);
 
-    useEffect(() => {
-        localStorage.setItem("wishlist_sarees_v1", JSON.stringify(wishlist));
-    }, [wishlist]);
+  const toggleWishlist = (id) => {
+    setWishlist((prev) =>
+      prev.includes(id)
+        ? prev.filter((item) => item !== id)
+        : [...prev, id]
+    );
+  };
 
-    const toggleWishlist = (id) => {
-        setWishlist((prev) =>
-            prev.includes(id)
-                ? prev.filter((item) => item !== id)
-                : [...prev, id]
-        );
-    };
+  return (
+    <Router>
+      <Routes>
 
-    return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<Mainpage />} />
-                <Route path="/home" element={<HomePage />} />
+        {/* PUBLIC ROUTES */}
+        <Route path="/" element={<Mainpage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
+        {/* PROTECTED ROUTES (NO ROLE) */}
+        <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
 
-                <Route
-                    path="/anita"
-                    element={
-                        <AnitaDongre
-                            wishlist={wishlist}
-                            toggleWishlist={toggleWishlist}
-                        />
-                    }
-                />
+        <Route
+          path="/anita"
+          element={
+            <ProtectedRoute>
+              <AnitaDongre wishlist={wishlist} toggleWishlist={toggleWishlist} />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-                    path="/designer/:id"
-                    element={
-                        <DesignerPage
-                            wishlist={wishlist}
-                            toggleWishlist={toggleWishlist}
-                        />
-                    }
-                />
-                <Route
-                    path="/product/:id"
-                    element={
-                        <ProductPage
-                            wishlist={wishlist}
-                            toggleWishlist={toggleWishlist}
-                        />
-                    }
-                />
-                <Route path="/checkout" element={<Checkout />} />
+        <Route
+          path="/designer/:id"
+          element={
+            <ProtectedRoute>
+              <DesignerPage wishlist={wishlist} toggleWishlist={toggleWishlist} />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-  path="/adminDashboard"
-  element={
-    <ProtectedRoute allowedRole="admin">
-      <AdminDashboard />
-    </ProtectedRoute>
-  }
-/>
+        <Route
+          path="/product/:id"
+          element={
+            <ProtectedRoute>
+              <ProductPage wishlist={wishlist} toggleWishlist={toggleWishlist} />
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-  path="/userDashboard"
-  element={
-    <ProtectedRoute allowedRole="user">
-      <UserDashBoard />
-    </ProtectedRoute>
-  }
-/>
+        <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
 
-<Route
-  path="/desingerDashboard"
-  element={
-    <ProtectedRoute allowedRole="designer">
-      <DesignerDashBoard />
-    </ProtectedRoute>
-  }
-/>
+        <Route path="/locatestore" element={<ProtectedRoute><LocateStore /></ProtectedRoute>} />
 
-                <Route path="/locatestore" element={<LocateStore />} />
-                <Route path="/home/contact" element={<Contect />} />
-                <Route
-                    path="/wishlist"
-                    element={
-                        <Whishlist
-                            wishlist={wishlist}
-                            toggleWishlist={toggleWishlist}
-                        />
-                    }
-                />
+        <Route path="/home/contact" element={<ProtectedRoute><Contect /></ProtectedRoute>} />
 
-                <Route path="/velvet" element={<Velvet />} />
-                <Route path="/denim" element={<Denim />} />
-                <Route path="/georgette" element={<Georgette />} />
-                <Route path="/sarees" element={<Sarees />} />
-                <Route path="/livin" element={<Livin />} />
-                <Route path="/silk" element={<Silk />} />
-                <Route path="/skirts-shorts" element={<SkirtsShorts />} />
-                <Route path="/home/about" element={<About />} />
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <Whishlist wishlist={wishlist} toggleWishlist={toggleWishlist} />
+            </ProtectedRoute>
+          }
+        />
 
-            </Routes>
-            <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop
-                closeOnClick
-                pauseOnHover
-                theme="colored"
-            />
-        </Router>
-    )
-}
+        <Route path="/velvet" element={<ProtectedRoute><Velvet /></ProtectedRoute>} />
+        <Route path="/denim" element={<ProtectedRoute><Denim /></ProtectedRoute>} />
+        <Route path="/georgette" element={<ProtectedRoute><Georgette /></ProtectedRoute>} />
+        <Route path="/sarees" element={<ProtectedRoute><Sarees /></ProtectedRoute>} />
+        <Route path="/livin" element={<ProtectedRoute><Livin /></ProtectedRoute>} />
+        <Route path="/silk" element={<ProtectedRoute><Silk /></ProtectedRoute>} />
+        <Route path="/skirts-shorts" element={<ProtectedRoute><SkirtsShorts /></ProtectedRoute>} />
+        <Route path="/home/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+
+        {/* ROLE BASED ROUTES (UNCHANGED) */}
+        <Route
+          path="/adminDashboard"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/userDashboard"
+          element={
+            <ProtectedRoute allowedRole="user">
+              <UserDashBoard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/desingerDashboard"
+          element={
+            <ProtectedRoute allowedRole="designer">
+              <DesignerDashBoard />
+            </ProtectedRoute>
+          }
+        />
+
+      </Routes>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="colored"
+      />
+    </Router>
+  );
+};
 
 export default RoutingPage;
