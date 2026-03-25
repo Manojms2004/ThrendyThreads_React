@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ShopByOccasion from "../ShopByOccasion";
 import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -18,6 +18,9 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
     category: "cotton",
   });
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const shopRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -103,6 +106,8 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
       // fetchProducts();
 
       // reset
+
+      shopRef.current?.refetch();
       setFormData({
         name: "",
         img: "",
@@ -121,32 +126,32 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
   return (
     <div style={{ background: "#f9f8f6", minHeight: "100vh", fontFamily: "sans-serif" }}>
 
-       <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
 
       <button
-  onClick={() => navigate('/home')}
-  style={{
-    position: "fixed",       // ✅ FIXED POSITION
-    top: "20px",             // distance from top
-    left: "20px",            // distance from left
-    zIndex: 1000,            // stay above all content
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "6px",
-    background: "#111",
-    color: "#fff",
-    border: "none",
-    padding: "7px 14px",
-    borderRadius: "4px",
-    fontSize: "12px",
-    fontWeight: "600",
-    cursor: "pointer",
-    letterSpacing: "0.05em",
-    width: "fit-content"
-  }}
->
-  <FaArrowLeft size={10} /> Back
-</button>
+        onClick={() => navigate('/home')}
+        style={{
+          position: "fixed",       // ✅ FIXED POSITION
+          top: "20px",             // distance from top
+          left: "20px",            // distance from left
+          zIndex: 1000,            // stay above all content
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "6px",
+          background: "#111",
+          color: "#fff",
+          border: "none",
+          padding: "7px 14px",
+          borderRadius: "4px",
+          fontSize: "12px",
+          fontWeight: "600",
+          cursor: "pointer",
+          letterSpacing: "0.05em",
+          width: "fit-content"
+        }}
+      >
+        <FaArrowLeft size={10} /> Back
+      </button>
 
       {/* HERO BANNER */}
       <div style={{ position: "relative", width: "100%", height: "320px", overflow: "hidden", background: "#111" }}>
@@ -232,12 +237,15 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
               </div>
 
               {/* Add Design Button */}
-              <button
-                onClick={handleAddPro}
-                style={{ background: "#111", color: "#fff", border: "2px solid #111", padding: "10px 22px", fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
-              >
-                + Add Design
-              </button>
+              {
+                user.role === 'designer' && <button
+                  onClick={handleAddPro}
+                  style={{ background: "#111", color: "#fff", border: "2px solid #111", padding: "10px 22px", fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
+                >
+                  + Add Design
+                </button>
+              }
+
             </div>
 
           </div>
@@ -252,6 +260,7 @@ export default function DesignerPage({ wishlist, toggleWishlist }) {
 
         {/* Products Section */}
         <ShopByOccasion
+          ref={shopRef}
           wishlist={wishlist}
           toggleWishlist={toggleWishlist}
           extraProducts={extraProducts}

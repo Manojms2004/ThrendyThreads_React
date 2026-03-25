@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, use } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiSearch, FiLogOut } from "react-icons/fi";
-import { FaChevronLeft, FaChevronRight, FaStar, FaRegHeart } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaStar, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import axios from "axios";
 import Contect from "./Contact";
@@ -80,8 +80,8 @@ export default function HomePage() {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const imageSrc = user?.image
-  ? `data:image/jpeg;base64,${user.image}`
-  : "https://i.pravatar.cc/40";
+    ? `data:image/jpeg;base64,${user.image}`
+    : "https://i.pravatar.cc/40";
 
   const [categories, setCategories] = useState([]);
 
@@ -189,6 +189,18 @@ export default function HomePage() {
 
           {/* Nav Links */}
           <nav className="flex gap-6 text-lg font-medium">
+
+            {
+              user.role === 'user' && <div
+                onClick={() => navigate("/checkout")}
+                className="cursor-pointer relative"
+              >
+                <FaShoppingCart size={20} className="hover:text-blue-500" />
+
+
+              </div>
+            }
+
             <span
               onClick={() => navigate("/home")}
               className="cursor-pointer hover:text-blue-500 text-[16px]"

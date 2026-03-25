@@ -1,64 +1,53 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaStar, FaHeart, FaRegHeart } from "react-icons/fa";
 import axios from "axios";
 
-export default function ShopByOccasion({
+const ShopByOccasion = forwardRef(function ShopByOccasion({
   wishlist = [],
-  toggleWishlist = () => { },
+  toggleWishlist = () => {},
   extraProducts = [],
   designerId,
-
-}) {
+}, ref) {
   const [selectedCategory, setSelectedCategory] = useState("cotton");
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
-  /* FETCH API */
+  // ✅ fetchProducts defined OUTSIDE useEffect so useImperativeHandle can access it
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get(
+        `https://localhost:44332/api/Product/GetProductsByDesignerId/${designerId}`
+      );
+      const mapped = res.data.map((p) => ({
+        id: p.productId,
+        name: p.productName,
+        img: p.productImage && p.productImage !== "undefined"
+          ? `data:image/jpeg;base64,${p.productImage}`
+          : "https://via.placeholder.com/300",
+        finalPrice: p.price,
+        category: p.category?.trim().toLowerCase(),
+        rating: 4.5,
+        designerId: p.designerId,
+      }));
+      setProducts(mapped);
+    } catch (err) {
+      console.error("API ERROR:", err);
+    }
+  };
+
+  // ✅ useImperativeHandle OUTSIDE useEffect
+  useImperativeHandle(ref, () => ({
+    refetch: fetchProducts,
+  }));
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        console.log("Calling API...");
-        console.log("DesignerId:", designerId);
-
-        const res = await axios.get(
-          `https://localhost:44332/api/Product/GetProductsByDesignerId/${designerId}`
-        );
-
-        console.log("API RESPONSE:", res.data);
-
-        const mapped = res.data.map((p) => ({
-          id: p.productId,
-          name: p.productName,
-          img:
-            p.productImage && p.productImage !== "undefined"
-              ? `data:image/jpeg;base64,${p.productImage}`
-              : "https://via.placeholder.com/300",
-          finalPrice: p.price,
-          category: p.category?.trim().toLowerCase(),
-          rating: 4.5,
-          designerId: p.designerId 
-        }));
-
-        setProducts(mapped);
-
-      } catch (err) {
-        console.error("API ERROR:", err);
-      }
-    };
-
     if (designerId) {
       fetchProducts();
     } else {
-      console.log("DesignerId missing ");
+      console.log("DesignerId missing");
     }
-
   }, [designerId]);
-
-  /*  FILTER ONLY API DATA */
-  // const productsToShow = products.filter(
-  //   (product) => product.category === selectedCategory
-  // );
 
   const formatPrice = (amount) =>
     new Intl.NumberFormat("en-IN", {
@@ -70,7 +59,6 @@ export default function ShopByOccasion({
   return (
     <div style={{ width: "100%", background: "#fff", padding: "8px 0", fontFamily: "sans-serif" }}>
 
-      {/* TITLE */}
       {!designerId && (
         <h2 style={{ fontSize: "1.4rem", fontWeight: "800", color: "#111", marginBottom: "16px", letterSpacing: "-0.01em" }}>
           Shop by Occasion
@@ -117,27 +105,18 @@ export default function ShopByOccasion({
                 onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.12)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 1px 8px rgba(0,0,0,0.06)"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                {/* IMAGE */}
                 <div
                   style={{ position: "relative", height: "240px", overflow: "hidden", cursor: "pointer", background: "#f5f5f5" }}
-                 onClick={() =>
-  navigate(`/product/${product.id}`, {
-    state: { designerId: product.designerId }
-  })
-}
+                  onClick={() => navigate(`/product/${product.id}`, { state: { designerId: product.designerId } })}
                 >
                   <img
                     src={product.img}
                     alt={product.name}
-                    onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/300";
-                    }}
+                    onError={(e) => { e.target.src = "https://via.placeholder.com/300"; }}
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.35s" }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.07)"}
                     onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
                   />
-
-                  {/* Wishlist */}
                   <button
                     onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
                     style={{ position: "absolute", top: "10px", right: "10px", background: "#fff", border: "none", borderRadius: "50%", width: "34px", height: "34px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.14)", cursor: "pointer" }}
@@ -148,12 +127,10 @@ export default function ShopByOccasion({
                   </button>
                 </div>
 
-                {/* DETAILS */}
                 <div style={{ padding: "10px 12px 12px" }}>
                   <p style={{ fontSize: "13px", fontWeight: "600", color: "#222", margin: "0 0 5px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {product.name}
                   </p>
-
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <span style={{ fontSize: "14px", fontWeight: "800", color: "#111" }}>
                       {formatPrice(product.finalPrice)}
@@ -162,9 +139,8 @@ export default function ShopByOccasion({
                       <FaStar style={{ color: "#111", fontSize: "9px" }} /> {product.rating}
                     </span>
                   </div>
-
                   <button
-                    onClick={() => navigate(`/product/${product.id}`)}
+                    onClick={() => navigate(`/product/${product.id}`, { state: { designerId: product.designerId } })}
                     style={{ marginTop: "10px", width: "100%", background: "#111", color: "#fff", border: "2px solid #111", padding: "7px", fontSize: "10px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
                   >
                     View Product
@@ -179,4 +155,6 @@ export default function ShopByOccasion({
 
     </div>
   );
-}
+});
+
+export default ShopByOccasion;

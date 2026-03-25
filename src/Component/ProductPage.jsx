@@ -9,7 +9,6 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const designerId = location.state?.designerId;
 
   const [showForm, setShowForm] = useState(false);
   const [requestData, setRequestData] = useState({ name: "", phone: "", message: "" });
@@ -20,15 +19,14 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  console.log(designerId)
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       try {
-        if (!designerId) return;
+        if (!apiProduct?.designerId) return;
 
         const res = await axios.get(
-          `https://localhost:44332/api/Product/GetProductsByDesignerId/${designerId}`
+          `https://localhost:44332/api/Product/GetProductsByDesignerId/${apiProduct.designerId}`
         );
 
         const mapped = res.data
@@ -52,7 +50,7 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
     };
 
     fetchRelatedProducts();
-  }, [designerId, id]);
+  }, [apiProduct, id]);
 
   // Fetch product from API
   useEffect(() => {
