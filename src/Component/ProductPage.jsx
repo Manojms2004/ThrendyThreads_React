@@ -14,6 +14,7 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
   const [requestData, setRequestData] = useState({ name: "", phone: "", message: "" });
 
   const [apiProduct, setApiProduct] = useState(null);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +79,7 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
 
   const handleAddCart = async (productId) => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      
       if (!user?.userId) {
         toast.error("Please login first");
         return;
@@ -261,20 +262,50 @@ export default function ProductPage({ wishlist = [], toggleWishlist }) {
             </div>
 
             {/* Buttons */}
-            <div style={{ display: "flex", gap: "8px", marginTop: "auto" }}>
-              <button
-                onClick={() => handleAddCart(apiProduct.productId)}
-                style={{ flex: 1, background: "#111", color: "#fff", border: "2px solid #111", padding: "10px 12px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
-              >
-                ADD TO CART
-              </button>
-              <button
-                onClick={() => setShowForm(true)}
-                style={{ flex: 1, background: "#fff", color: "#111", border: "2px solid #111", padding: "10px 12px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "4px", cursor: "pointer" }}
-              >
-                Request Design Change
-              </button>
-            </div>
+        {
+  user?.role !== "designer" && user?.role !== "admin" && (
+    <div style={{ display: "flex", gap: "8px", marginTop: "auto" }}>
+      <button
+        onClick={() => handleAddCart(apiProduct.productId)}
+        style={{
+          flex: 1,
+          background: "#111",
+          color: "#fff",
+          border: "2px solid #111",
+          padding: "10px 12px",
+          fontSize: "11px",
+          fontWeight: "700",
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          borderRadius: "4px",
+          cursor: "pointer"
+        }}
+      >
+        ADD TO CART
+      </button>
+
+      <button
+        onClick={() => setShowForm(true)}
+        style={{
+          flex: 1,
+          background: "#fff",
+          color: "#111",
+          border: "2px solid #111",
+          padding: "10px 12px",
+          fontSize: "11px",
+          fontWeight: "700",
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          borderRadius: "4px",
+          cursor: "pointer"
+        }}
+      >
+        Request Design Change
+      </button>
+    </div>
+  )
+}
+           
 
           </div>
         </div>
